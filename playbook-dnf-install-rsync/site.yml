@@ -1,0 +1,11 @@
+- name: Install or upgrade RPM from remote repo
+  hosts: localhost
+  connection: local
+  gather_facts: True
+
+  roles:
+    - eth-update
+
+  tasks:
+    - name: Install via DNF
+      shell: "dnf install -y rsync"

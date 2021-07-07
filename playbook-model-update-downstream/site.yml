@@ -1,0 +1,15 @@
+- name: Install or upgrade Model for downstream device
+  hosts: downstream
+  gather_facts: True
+
+  roles:
+    - eth-update
+
+  tasks:
+    - name: Copy resources to target
+      copy:
+        src: "{{ playbook_dir }}/res"
+        dest: /tmp
+
+    - name: Update Model
+      shell: "cp /tmp/res/new_face_mask_detection.pb /home/jetson/Desktop/FaceMaskDetection/models/new_face_mask_detection.pb"
