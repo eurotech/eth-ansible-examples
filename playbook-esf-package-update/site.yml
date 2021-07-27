@@ -36,7 +36,7 @@
       block:
         - name: Install DP Https
           uri:
-            url: https://127.0.0.1/services/deploy/_install
+            url: https://127.0.0.1/services/deploy/v1/_install
             user: "admin"
             password: "{{ esf_default_admin_password.stdout }}"
             force_basic_auth: yes
@@ -48,7 +48,7 @@
       rescue:
         - name: Install DP Http
           uri:
-            url: http://127.0.0.1/services/deploy/_install
+            url: http://127.0.0.1/services/deploy/v1/_install
             user: "admin"
             password: "admin"
             force_basic_auth: yes
