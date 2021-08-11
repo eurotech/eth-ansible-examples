@@ -1,0 +1,44 @@
+#Chirpstack Install
+- name: Chirpstack Install
+  debug:
+    msg: "Chirpstack Install"
+
+    #chirpstack
+- name: copy configuration files for Chirpstack apps 
+  copy:
+    src: chirpstack_config/
+    dest: /etc
+    mode: "0644"
+
+- name: pull chirpstack gateway bridge
+  command: docker pull public.ecr.aws/n6v5k0e3/chirpstack-gateway-bridge:3.10.0-arm64v8 
+
+- name: pull chirpstack network server
+  command: docker pull public.ecr.aws/n6v5k0e3/chirpstack-network-server:3.12.3-arm64v8 
+
+- name: pull chirpstack application server
+  command: docker pull public.ecr.aws/n6v5k0e3/chirpstack-application-server:3.14.0-arm64v8
+
+- name: start chirpstack gateway bridge container
+  command: docker run --name chirpstack-gateway-bridge -p 1700:1700/udp --add-host mqttserver:172.18.0.1 --network "chirpbridge" --ip 172.18.0.4 -v /etc/chirpstack-gateway-bridge/:/etc/chirpstack-gateway-bridge -d --restart unless-stopped public.ecr.aws/n6v5k0e3/chirpstack-gateway-bridge:3.10.0-arm64v8 
+
+- name: start chirpstack network server container
+  command: docker run --name chirpstack-network-server --add-host mqttserver:172.18.0.1 --network "chirpbridge" --ip 172.18.0.5 -v /etc/chirpstack-network-server:/etc/chirpstack-network-server -d --restart unless-stopped public.ecr.aws/n6v5k0e3/chirpstack-network-server:3.12.3-arm64v8 
+
+- name: start chirpstack application server container
+  command: docker run --name chirpstack-application-server -p 8080:8080 --add-host mqttserver:172.18.0.1 --network "chirpbridge" --ip 172.18.0.6 -v /etc/chirpstack-application-server:/etc/chirpstack-application-server -d --restart unless-stopped public.ecr.aws/n6v5k0e3/chirpstack-application-server:3.14.0-arm64v8
+
+- name: chirpstack application server start confirmation
+  block:
+    - name: wait for chirpstack application server to start up (this can take up to 3 minutes)
+      command: docker logs chirpstack-application-server
+      register: caslogs
+      retries: 18
+      delay: 10
+      until: caslogs.stderr.find("starting join-server api") != -1 or caslogs.stdout.find("starting join-server api") != -1
+      any_errors_fatal: true
+
+  rescue:
+    - name: Chirpstack application server failed to start within 3 minutes
+      fail:
+        msg: "FAILURE: Chirpstack Application Server failed to start within 3 minutes. Check TE Sensor Demo Kit Assembly Instructions for troubleshooting steps to take."

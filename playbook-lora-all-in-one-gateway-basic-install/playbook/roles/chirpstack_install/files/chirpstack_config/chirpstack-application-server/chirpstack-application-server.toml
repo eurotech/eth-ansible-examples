@@ -1,0 +1,139 @@
+# See https://www.chirpstack.io/application-server/install/config/ for a full
+# configuration example and documentation.
+
+[postgresql]
+dsn="postgres://chirpstack_as:CASpwLoRa@postgres:5432/chirpstack_as?sslmode=disable"
+
+[redis]
+url="redis://redis:6379"
+
+  # Integration configures the data integration.
+  #
+  # This is the data integration which is available for all applications,
+  # besides the extra integrations that can be added on a per-application
+  # basis.
+  [application_server.integration]
+  # Payload marshaler.
+  #
+  # This defines how the MQTT payloads are encoded. Valid options are:
+  # * protobuf:  Protobuf encoding
+  # * json:      JSON encoding (easier for debugging, but less compact than 'protobuf')
+  # * json_v3:   v3 JSON (will be removed in the next major release)
+  marshaler="json"
+  
+# Enabled integrations.
+  #
+  # Enabled integrations are enabled for all applications. Multiple
+  # integrations can be configured.
+  # Do not forget to configure the related configuration section below for
+  # the enabled integrations. Integrations that can be enabled are:
+  # * mqtt              - MQTT broker
+  # * amqp              - AMQP / RabbitMQ
+  # * aws_sns           - AWS Simple Notification Service (SNS)
+  # * azure_service_bus - Azure Service-Bus
+  # * gcp_pub_sub       - Google Cloud Pub/Sub
+  # * kafka             - Kafka distributed streaming platform
+  # * postgresql        - PostgreSQL database
+  enabled=["mqtt"]
+
+
+  # MQTT integration backend.
+  [application_server.integration.mqtt]
+  # Event topic template.
+  event_topic_template="application/{{ .ApplicationID }}/device/{{ .DevEUI }}/event/{{ .EventType }}"
+
+  # Command topic template.
+  command_topic_template="application/{{ .ApplicationID }}/device/{{ .DevEUI }}/command/{{ .CommandType }}"
+
+  # Retain events.
+  #
+  # The MQTT broker will store the last publised message, when retain events is set
+  # to true. When a MQTT client connects and subscribes, it will always receive the
+  # last published message.
+  retain_events=false
+
+  # MQTT server (e.g. scheme://host:port where scheme is tcp, ssl or ws)
+  server="tcp://mqttserver:1883"
+
+  # Connect with the given username (optional)
+  username="LoRaMQTTUser"
+
+  # Connect with the given password (optional)
+  password="LoRaMQTTpw"
+
+  # Maximum interval that will be waited between reconnection attempts when connection is lost.
+  # Valid units are 'ms', 's', 'm', 'h'. Note that these values can be combined, e.g. '24h30m15s'.
+  max_reconnect_interval="1m0s"
+
+  # Quality of service level
+  #
+  # 0: at most once
+  # 1: at least once
+  # 2: exactly once
+  #
+  # Note: an increase of this value will decrease the performance.
+  # For more information: https://www.hivemq.com/blog/mqtt-essentials-part-6-mqtt-quality-of-service-levels
+  qos=0
+
+  # Clean session
+  #
+  # Set the "clean session" flag in the connect message when this client
+  # connects to an MQTT broker. By setting this flag you are indicating
+  # that no messages saved by the broker for this client should be delivered.
+  clean_session=true
+
+  # Client ID
+  #
+  # Set the client id to be used by this client when connecting to the MQTT
+  # broker. A client id must be no longer than 23 characters. When left blank,
+  # a random id will be generated. This requires clean_session=true.
+  client_id=""
+
+  # CA certificate file (optional)
+  #
+  # Use this when setting up a secure connection (when server uses ssl://...)
+  # but the certificate used by the server is not trusted by any CA certificate
+  # on the server (e.g. when self generated).
+  ca_cert=""
+
+  # TLS certificate file (optional)
+  tls_cert=""
+
+  # TLS key file (optional)
+  tls_key=""
+
+[application_server.api]
+public_host="chirpstack-application-server:8001"
+
+  # Settings for the "external api"
+  #
+  # This is the API and web-interface exposed to the end-user.
+  [application_server.external_api]
+  # ip:port to bind the (user facing) http server to (web-interface and REST / gRPC api)
+  bind="0.0.0.0:8080"
+
+  # http server TLS certificate (optional)
+  tls_cert=""
+
+  # http server TLS key (optional)
+  tls_key=""
+
+  # JWT secret used for api authentication / authorization
+  # You could generate this by executing 'openssl rand -base64 32' for example
+  jwt_secret="/0vqK5mS/upA2ugowXYhxcSk6javr5+zR767jqmTScQ="
+
+  # Allow origin header (CORS).
+  #
+  # Set this to allows cross-domain communication from the browser (CORS).
+  # Example value: https://example.com.
+  # When left blank (default), CORS will not be used.
+  cors_allow_origin=""
+
+# Join-server configuration.
+#
+# ChirpStack Application Server implements a (subset) of the join-api specified by the
+# LoRaWAN Backend Interfaces specification. This API is used by ChirpStack Network Server
+# to handle join-requests.
+[join_server]
+# ip:port to bind the join-server api interface to
+bind="0.0.0.0:8003"

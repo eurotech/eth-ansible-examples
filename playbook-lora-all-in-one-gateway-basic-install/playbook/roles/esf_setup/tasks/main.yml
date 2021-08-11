@@ -1,0 +1,189 @@
+#ESF SETUP
+- name: ESF Setup
+  debug:
+    msg: "ESF Setup"
+
+# #Install ESF
+# - name: Search for ESF package
+#   shell: rpm -qa | grep esf-reliagate-10-14
+#   args:
+#     warn: false
+#   register: rpm_output
+#   ignore_errors: yes
+
+# - name: Remove ESF
+#   command: rpm -e {{rpm_output.stdout}}
+#   args:
+#     warn: false
+#   when: "rpm_output.rc == 0"
+
+# - name: Remove ESF resources
+#   file:
+#     path: /opt/eurotech/esf
+#     state: absent
+
+# - name: Install ESF (for EL 27.0.2)
+#   command: rpm -ivh roles/esf_setup/files/esf_rpm/esf-reliagate-10-14-6.2.0-1.aarch64.rpm
+#   args:
+#     warn: false
+#   when: el_version == "EL_27.0.2"
+
+# # Workarounds for EL 27.1.0 RC
+# # Logrotate isn't installed in image, so we need to ignore dependencies
+# # the package isn't signed, so we need to ignore the signature
+# - name: Install ESF (for EL 27.1.0)
+#   command: rpm -ivh roles/esf_setup/files/esf_rpm/esf-reliagate-10-14-6.2.0-1.aarch64.rpm --nodeps --nosignature
+#   args:
+#     warn: false
+#   when: el_version == "EL_27.1.0"
+
+# #Configure ESF
+#     #remove old ESF snapshots
+# - name: Find ESF snapshots
+#   find:
+#     paths: 
+#       - /opt/eurotech/esf/user/snapshots
+#     patterns: "*.xml"
+#   register: esf_snapshots
+
+# - name: Remove existing ESF snapshots
+#   file:
+#     path: "{{ item.path }}"
+#     state: absent
+#   with_items: "{{ esf_snapshots.files }}"
+
+    #copy DPs
+- name: copy deployment packages 
+  copy:
+    src: packages/
+    dest: /opt/eurotech/esf/packages
+    mode: "0644"
+  register: copy_dps
+
+    #modify dpa.properties (or create) if it doesn't exist
+- name: add deployment packages to ESF
+  lineinfile:
+    path: /opt/eurotech/esf/packages/dpa.properties
+    line: "{{ item.line }}"
+    create: yes
+    mode: "0644"
+  with_items:
+    - { line: 'com.eurotech.framework.amq7=file\:/opt/eurotech/esf/packages/com.eurotech.framework.amq7_1.1.0.dp' }
+    - { line: 'org.eclipse.kura.cloudconnection.raw.mqtt.provider=file\:/opt/eurotech/esf/packages/org.eclipse.kura.cloudconnection.raw.mqtt.provider_1.0.0.dp' }
+  register: modify_dpa
+
+- name: Restart Kura if deployment package(s) were changed
+  block:
+  #Bounce Kura
+  - name: Restart ESF
+    systemd:
+      name: kura
+      state: restarted
+
+  #Get current time (log start time)
+  - name: save current time
+    command: 'date "+%Y-%m-%d %H:%M:%S"'
+    register: logstarttime
+
+  #Set fact for log start time
+  - name: parse current time
+    set_fact:
+      log_start_time: "{{ logstarttime.stdout }}"
+
+  - name: kura restart confirmation
+    block:
+      - name: wait for ESF to start up (this can take up to 4 minutes)
+        command: 'journalctl --since "{{log_start_time}}"'
+        register: systemlogs
+        retries: 24
+        delay: 10
+        until: systemlogs.stderr.find("Registering SelfConfiguringComponent - org.eclipse.kura.web.Console....Done") != -1 or systemlogs.stdout.find("Registering SelfConfiguringComponent - org.eclipse.kura.web.Console....Done") != -1
+        any_errors_fatal: true
+
+    rescue:
+      - name: ESF failed to restart within 4 minutes
+        fail:
+          msg: "FAILURE: ESF failed to restart within 4 minutes. Check ESF log for errors."
+  
+  when: copy_dps.changed or modify_dpa.changed #block when
+
+#snapshot contains config for Raw MQTT Cloud Connection and Artemis MQTT Broker
+- name: Apply Snapshot to ESF (ESF 7 HTTPS Method)
+  uri:
+    url: "https://127.0.0.1/services/configuration/v1/snapshots/_upload"
+    user: "{{esf_username}}"
+    password: "{{esf_password}}"
+    status_code: 200
+    force_basic_auth: yes
+    validate_certs: no
+    method: POST
+    headers: 
+      Content-Type: "application/xml" 
+    body: "{{lookup('file', 'snapshots/LoRa_snapshot.xml', errors='strict')}}" 
+
+##Add Open Port 1883 for interface Chirpbridge to Firewall
+#Get Current Firewall Config
+- name: Request Current Firewall Configuration from ESF (ESF 7 HTTPS Method)
+  uri:
+    url: "https://127.0.0.1/services/configuration/v1/configurableComponents/configurations/byPid/org.eclipse.kura.net.admin.FirewallConfigurationService"
+    user: "{{esf_username}}"
+    password: "{{esf_password}}"
+    status_code: 200
+    force_basic_auth: yes
+    validate_certs: no
+    method: GET
+  register: firewall_config
+
+#Get Firewall Open Ports List
+- name: Parse Firewall Open Ports List
+  set_fact:
+    firewall_open_ports: "{{ firewall_config.json.properties.get('firewall.open.ports') }}"
+
+- name: Update Firewall Open Ports List (SKIP = port already opened)
+  set_fact: 
+    firewall_open_ports: "{{ firewall_open_ports }};1883,tcp,0.0.0.0/0,chirpbridge,,,,#"
+  when: firewall_open_ports is not search("1883,tcp,0.0.0.0/0,chirpbridge,,,,#")
+  register: firewall_ports_update
+
+- name: Apply firewall update to gateway (ESF 7 HTTPS Method) (SKIP = port already open)
+  uri:
+    url: "https://127.0.0.1/services/configuration/v1/configurableComponents/configurations/byPid/org.eclipse.kura.net.admin.FirewallConfigurationService/_update"
+    user: "{{esf_username}}"
+    password: "{{esf_password}}"
+    status_code: 200
+    force_basic_auth: yes
+    validate_certs: no
+    method: POST
+    body_format: json
+    body:
+      takeSnapshot: true
+      componentConfigurationRequest:
+        properties: 
+          firewall.open.ports: "{{ firewall_open_ports }}"
+  when: firewall_ports_update is not skipped
+
+#     #apply custom ESF settings
+# - name: copy custom ESF configuration files
+#   copy:
+#     src: "{{ item.src }}"
+#     dest: "{{ item.dest }}"
+#     mode: "0644"
+#   with_items:
+#     - { src: snapshots/snapshot_0.xml, dest: /opt/eurotech/esf/user/snapshots }
+#     - { src: security/cacerts.ks, dest: /opt/eurotech/esf/user/security }
+#     - { src: package_config/dpa.properties, dest: /opt/eurotech/esf/data }
+#     - { src: networking/interfaces, dest: /etc/network }
+#     - { src: networking/iptables, dest: /etc/sysconfig }
+#     - { src: networking/kuranet.conf, dest: /opt/eurotech/esf/user}
+
+# - name: copy custom ESF configuration files for EL 27.1.0
+#   copy:
+#     src: "{{ item.src }}"
+#     dest: "{{ item.dest }}"
+#     mode: "0644"
+#   with_items:
+#     - { src: logging_config/log4j.xml, dest: /opt/eurotech/esf/user} #set ESF to log using systemd journal logger
+#   when: el_version == "EL_27.1.0"
+
+# - name: import custom firewall rules
+#   shell: iptables-restore < /etc/sysconfig/iptables

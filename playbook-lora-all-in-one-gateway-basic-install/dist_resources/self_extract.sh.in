@@ -1,0 +1,27 @@
+#!/bin/sh
+UPDATE_PKG_MD5=__MD5__
+UPDATE_NAME=__UPDATE_NAME__
+UPDATE_VERSION=__UPDATE_VERSION__
+
+UPDATE_PKG_DIR=$(mktemp -d)
+UPDATE_PKG=$(mktemp)
+
+ARCHIVE=`awk '/^__ARCHIVE_BELOW__/ {print NR + 1; exit 0; }' $0`
+
+tail -n+$ARCHIVE $0 > ${UPDATE_PKG}
+
+if ! [ "$(md5sum ${UPDATE_PKG} | cut -d\  -f 1)" = ${UPDATE_PKG_MD5} ]
+then
+  echo "installer package corrupted, exiting"
+  exit 1
+fi
+
+tar -zxvf ${UPDATE_PKG} -C ${UPDATE_PKG_DIR}
+
+cd ${UPDATE_PKG_DIR} || exit
+
+nohup /bin/sh --login -c "ansible-playbook site.yml" >> "/opt/eurotech/esf/log/${UPDATE_NAME}-${UPDATE_VERSION}.log" 2>&1 &
+
+exit 0
+
+__ARCHIVE_BELOW__

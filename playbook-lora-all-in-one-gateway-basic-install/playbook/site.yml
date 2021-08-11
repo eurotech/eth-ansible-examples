@@ -1,0 +1,102 @@
+- name: Install TE Demo Kit
+  hosts: localhost
+  connection: local
+
+  vars:
+    gw_1012: "ReliaGATE 10-12"
+    gw_1014: "ReliaGATE 10-14"
+    esf_username: "admin"
+    esf_password: "admin"
+
+  pre_tasks:
+    ##Verify Internet Access
+    - name: Check for Internet Connectivity
+      block:
+      - name: check for internet connectivity
+        command: ping -c 1 -w 2 8.8.8.8
+        any_errors_fatal: true
+        changed_when: false
+
+      rescue:
+        - name: Internet is unreachable
+          fail:
+            msg: "Can't access the internet. Please run the playbook again or troubleshoot internet connectivity if this message is displayed more than twice."
+
+    ##Check Gateway Model
+    - name: Get Gateway Model
+      command: eth_model
+      register: eth_model
+      changed_when: false
+
+    - name: Parse Gateway Model
+      set_fact:
+        gw_model: "{{ eth_model.stdout }}"
+
+    - name: Display Gateway Model
+      debug:
+        msg: "Gateway Model: {{ gw_model }}."
+
+    - name: Verify Gateway Model is Valid (Skipped = PASS)
+      fail:
+        msg: "Gateway Model must be ReliaGATE 10-12 or ReliaGATE 10-14 but was {{ gw_model }}."
+      when: #list implies logical AND between all 
+        - gw_model != gw_1012
+        - gw_model != gw_1014
+
+    ##Check EL Version
+    - name: Get EL Version
+      command: eth_vers_os
+      register: eth_vers_os
+      changed_when: false
+
+    - name: Parse EL Version
+      set_fact:
+        el_version: "{{ eth_vers_os.stdout }}"
+
+    - name: Display EL Version
+      debug:
+        msg: "EL Version Found: {{ el_version }}."
+
+    - name: Verify EL Version is Valid for ReliaGATE 10-12 (Skipped = PASS)
+      fail: 
+        msg: "For a ReliaGATE 10-12, the EL version must be EL_27.0.0_LoRa_Fix but was {{ el_version }}.  
+              You must be running EL 27.0.0 and have the LoRa Fix installed.  
+              Contact Eurotech for instructions on installing the correct EL version with the LoRa Fix."
+      when: #list implies logical AND between all 
+        - gw_model == gw_1012
+        - el_version != "EL_27.0.0_LoRa_fix"
+
+    - name: Verify EL Version is Valid for ReliaGATE 10-14 (Skipped = PASS)
+      fail: 
+        msg: "For a ReliaGATE 10-14, the EL version must be EL_27.0.2 or EL_27.1.0 but was {{ el_version }}.  
+              Contact Eurotech for instructions on installing the correct version of EL."
+      when: #list implies logical AND between all 
+        - gw_model == gw_1014
+        - el_version != "EL_27.0.2" 
+        - el_version != "EL_27.1.0"
+
+    ##Check to make sure Docker is installer
+    - name: Check if Docker is installed
+      shell: docker ps
+      register: docker_check
+      failed_when: false
+      changed_when: false
+
+    - name: Verify Docker is installed (Skipped = PASS)
+      fail:
+        msg: "Docker must be installed! Install docker, restart gateway, and run playbook again."
+      when: docker_check.stderr is search("command not found")
+
+  roles:
+    - reset_environment
+    - pre_esf_linux_setup
+    - esf_setup
+    - post_esf_linux_setup
+    - chirpstack_install
+    - chirpstack_configure
+
+  post_tasks:
+       
+#    - name: Reboot gateway
+#      shell: /sbin/reboot
+#      when: reboot

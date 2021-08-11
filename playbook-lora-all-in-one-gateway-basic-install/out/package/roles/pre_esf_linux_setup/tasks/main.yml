@@ -1,0 +1,30 @@
+#PRE-ESF SETUP
+- name: Pre-ESF Setup
+  debug:
+    msg: "Pre-ESF Setup"
+
+# #Firewall Workaround Setup
+# - name: Copy firewall workaround files
+#   copy: 
+#     src: "{{ item.src }}"
+#     dest: "{{ item.dest }}"
+#     mode: "{{ item.mode }}"
+#   with_items:
+#     - { src: firewall/addon-iptables, dest: /opt/firewall-docker-workaround/, mode: "0644" }
+#     - { src: firewall/firewall_cust, dest: /etc/init.d/, mode: "0755" }
+#     - { src: firewall/firewall_cust_aux, dest: /etc/init.d/, mode: "0755" }
+
+- name: start docker
+  systemd:
+    name: docker
+    state: started
+    #enabled: yes #this doesn't work due to bug
+
+#Enable Docker
+- name: enable docker start-at-boot
+  become: yes
+  shell: systemctl reenable docker
+
+#Create Docker network
+- name: create docker network chirpbridge
+  command: docker network create -d bridge --subnet 172.18.0.0/16 --gateway 172.18.0.1 --opt com.docker.network.bridge.name=chirpbridge chirpbridge
