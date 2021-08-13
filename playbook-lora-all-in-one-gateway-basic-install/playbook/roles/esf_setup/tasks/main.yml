@@ -119,7 +119,7 @@
     method: POST
     headers: 
       Content-Type: "application/xml" 
-    body: "{{lookup('file', 'snapshots/LoRa_snapshot.xml', errors='strict')}}" 
+    body: "{{lookup('file', 'snapshots/LoRa_system_base_snapshot.xml', errors='strict')}}" 
 
 ##Add Open Port 1883 for interface Chirpbridge to Firewall
 #Get Current Firewall Config
