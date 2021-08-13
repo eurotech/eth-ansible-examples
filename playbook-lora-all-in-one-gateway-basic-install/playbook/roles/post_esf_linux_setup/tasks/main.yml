@@ -17,10 +17,10 @@
   command: docker pull redis:6.2.1-alpine3.13
 
 - name: create redis data volume
-  command: docker volume create redis_data
+  command: docker volume create redis_data_chirpstack
     
 - name: start redis container
-  command: docker run --name redis --network "chirpbridge" --ip 172.18.0.2 -v redis_data:/data -d --restart unless-stopped redis:6.2.1-alpine3.13 redis-server --appendonly yes
+  command: docker run --name redis_chirpstack --network "chirpbridge" --ip 172.18.0.2 -v redis_data_chirpstack:/data -d --restart unless-stopped redis:6.2.1-alpine3.13 redis-server --appendonly yes
 
 - name: redis server start confirmation
   block:
@@ -48,10 +48,10 @@
   command: docker pull postgres:9.6.21-alpine
 
 - name: create postgres data volume
-  command: docker volume create postgres_data
+  command: docker volume create postgres_data_chirpstack
     
 - name: start postgres container
-  command: docker run --name postgres --network "chirpbridge" --ip 172.18.0.3 -v postgres_data:/var/lib/postgresql/data -v /etc/postgres:/docker-entrypoint-initdb.d -e POSTGRES_PASSWORD=root -d --restart unless-stopped postgres:9.6.21-alpine
+  command: docker run --name postgres_chirpstack --network "chirpbridge" --ip 172.18.0.3 -v postgres_data_chirpstack:/var/lib/postgresql/data -v /etc/postgres:/docker-entrypoint-initdb.d -e POSTGRES_PASSWORD=root -d --restart unless-stopped postgres:9.6.21-alpine
 
 - name: postgres server start confirmation
   block:

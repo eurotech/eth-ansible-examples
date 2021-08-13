@@ -18,30 +18,27 @@
 - name: stop all docker containers
   command: "docker stop {{ item }}"
   register: docker_result
-  with_items:
-    - redis-chirpstack
-    - postgres-chirpstack
-    - chirpstack-application-server
-    - chirpstack-network-server
-    - chirpstack-gateway-bridge
+  loop: "{{ docker_image_names }}"
   failed_when: 
     - docker_result.stderr != ""
     - docker_result.stderr is not search("requires at least 1 argument")
 
 - name: remove all docker containers
-  shell: docker rm $(docker ps -a -q)
+  command: "docker rm {{ item }}"
+  loop: "{{ docker_image_names }}"
   failed_when: 
     - docker_result.stderr != ""
     - docker_result.stderr is not search("requires at least 1 argument")
 
 - name: remove all docker volumes
-  shell: docker volume rm $(docker volume ls -q)
+  command: "docker volume rm {{ item }}"
+  loop: "{{ docker_volume_names }}"
   failed_when: 
     - docker_result.stderr != ""
     - docker_result.stderr is not search("requires at least 1 argument")
 
 - name: remove chirpstack docker network
-  shell: docker network rm chirpbridge
+  command: docker network rm chirpbridge
   failed_when:
     - docker_result.stderr != ""
     - docker_result.stderr is not search("no such network")

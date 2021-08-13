@@ -7,6 +7,15 @@
     gw_1014: "ReliaGATE 10-14"
     esf_username: "admin"
     esf_password: "admin"
+    docker_image_names:
+      - redis-chirpstack
+      - postgres-chirpstack
+      - chirpstack-application-server
+      - chirpstack-network-server
+      - chirpstack-gateway-bridge
+    docker_volume_names:
+      - redis_data_chirpstack
+      - postgres_data_chirpstack
 
   pre_tasks:
     ##Verify Internet Access
