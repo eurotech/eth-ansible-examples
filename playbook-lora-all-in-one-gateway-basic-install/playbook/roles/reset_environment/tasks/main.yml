@@ -21,24 +21,31 @@
   loop: "{{ docker_image_names }}"
   failed_when: 
     - docker_result.stderr != ""
-    - docker_result.stderr is not search("requires at least 1 argument")
+    - docker_result.stderr is not search("No such container:")
+  changed_when: docker_result.stderr is not search("No such container:")
 
 - name: remove all docker containers
   command: "docker rm {{ item }}"
+  register: docker_result
   loop: "{{ docker_image_names }}"
   failed_when: 
     - docker_result.stderr != ""
-    - docker_result.stderr is not search("requires at least 1 argument")
+    - docker_result.stderr is not search("No such container:")
+  changed_when: docker_result.stderr is not search("No such container:")
 
 - name: remove all docker volumes
   command: "docker volume rm {{ item }}"
+  register: docker_result
   loop: "{{ docker_volume_names }}"
   failed_when: 
     - docker_result.stderr != ""
-    - docker_result.stderr is not search("requires at least 1 argument")
+    - docker_result.stderr is not search("No such volume:")
+  changed_when: docker_result.stderr is not search("No such volume:")
 
 - name: remove chirpstack docker network
   command: docker network rm chirpbridge
+  register: docker_result
   failed_when:
     - docker_result.stderr != ""
-    - docker_result.stderr is not search("no such network")
+    - docker_result.stderr is not search("No such network:")
+  changed_when: docker_result.stderr is not search("No such network:")

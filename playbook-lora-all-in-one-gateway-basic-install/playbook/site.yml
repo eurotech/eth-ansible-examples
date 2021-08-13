@@ -14,8 +14,8 @@
       - chirpstack-network-server
       - chirpstack-gateway-bridge
     docker_volume_names:
-      - redis_data_chirpstack
-      - postgres_data_chirpstack
+      - redis-data-chirpstack
+      - postgres-data-chirpstack
 
   pre_tasks:
     ##Verify Internet Access
@@ -98,11 +98,11 @@
 
   roles:
     - reset_environment
-    - pre_esf_linux_setup
-    - esf_setup
-    - post_esf_linux_setup
-    - chirpstack_install
-    - chirpstack_configure
+    #- pre_esf_linux_setup
+    #- esf_setup
+    #- post_esf_linux_setup
+    #- chirpstack_install
+    #- chirpstack_configure
 
   post_tasks:
        
