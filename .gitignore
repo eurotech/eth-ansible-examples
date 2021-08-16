@@ -1,5 +1,8 @@
 # Ansible Script Output File
 out/
+dist_resources/
+freshrun.sh
+mkdist.sh
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
