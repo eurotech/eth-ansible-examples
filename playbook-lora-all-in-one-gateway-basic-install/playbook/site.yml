@@ -5,8 +5,6 @@
   vars:
     gw_1012: "ReliaGATE 10-12"
     gw_1014: "ReliaGATE 10-14"
-    esf_username: "admin"
-    esf_password: "admin"
     docker_image_names:
       - redis-chirpstack
       - postgres-chirpstack
@@ -16,7 +14,12 @@
     docker_volume_names:
       - redis-data-chirpstack
       - postgres-data-chirpstack
-    esf_api_http_protocol: "http"
+    esf_username: "admin"
+    #EFS version specific variables
+    #These variables are set to a default of EFS 6.2.0. 
+    #If EFS 7 is in use, they will be changed (in the validate_environment role)
+    esf_api_http_protocol: "http" #EFS 6.2.0: http; EFS 7: https
+    esf_password: "admin" #EFS 6.2.0: "admin"; EFS 7: serial number
 
   #pre_tasks:
 
