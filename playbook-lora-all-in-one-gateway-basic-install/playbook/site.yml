@@ -16,8 +16,9 @@
     docker_volume_names:
       - redis-data-chirpstack
       - postgres-data-chirpstack
+    esf_api_http_protocol: "http"
 
-  pre_tasks:
+  #pre_tasks:
 
   roles:
     - validate_environment

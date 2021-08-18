@@ -69,6 +69,55 @@
     - el_version != "EL_27.0.2" 
     - el_version != "EL_27.1.0"
 
+##Check ESF Version
+- name: Get ESF Version
+  command: eth_vers_esf
+  register: eth_vers_esf
+  changed_when: false
+
+- name: Prase Entire ESF Version
+  set_fact:
+    esf_version: "{{ eth_vers_esf.stdout }}"
+
+- name: Parse ESF Major Version Number
+  set_fact:
+    esf_major_version: "{{ eth_vers_esf.stdout[4] }}"
+
+- name: Display ESF Version info
+  debug:
+    msg: "ESF Version Found: {{ esf_version }}. This is ESF {{ esf_major_version }}."
+
+- name: Verify ESF Version is Valid
+  fail: 
+    msg: "ESF must be version 6.2.0 or later, but was {{ esf_version }}.  
+          You must be running ESF 6.2.0 or later.  
+          Contact Eurotech for instructions on installing the correct ESF version."
+  when: #list implies logical AND between all 
+    - esf_major_version != "7"
+    - esf_version != "ESF_6.2.0"
+
+##Set variables based on ESF version
+- name: Set variables for ESF 7 Block
+  block:
+    - name: Get ESF 7 Default Password (SKIP = ESF 6.2.0 detected)
+      command: eth_serial_number
+      register: eth_serial_number
+      changed_when: false
+
+    - name: Save ESF 7 Default Password (SKIP = ESF 6.2.0 detected)
+      set_fact:
+        esf_password: "{{ eth_serial_number.stdout }}"
+
+    - name: Set API protocol for ESF 7 (SKIP = ESF 6.2.0 detected)
+      set_fact:
+        esf_api_http_protocol: "https"
+
+    - name: Display ESF Version info
+      debug:
+        msg: "ESF Default Password set to: {{ esf_password }}. ESF API protocol set to {{ esf_api_http_protocol }}."
+
+  when: esf_major_version == "7" #block when 
+
 ##Check to make sure Docker is installer
 - name: Check if Docker is installed
   shell: docker ps
