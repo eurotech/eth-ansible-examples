@@ -51,7 +51,7 @@
   debug:
     msg: "EL Version Found: {{ el_version }}."
 
-- name: Verify EL Version is Valid for ReliaGATE 10-12 (Skipped = PASS)
+- name: Verify EL Version is Valid for ReliaGATE 10-12 (Skipped = PASS or Gateway is not a 10-12)
   fail: 
     msg: "For a ReliaGATE 10-12, the EL version must be EL_27.0.0_LoRa_Fix but was {{ el_version }}.  
           You must be running EL 27.0.0 and have the LoRa Fix installed.  
@@ -60,7 +60,7 @@
     - gw_model == gw_1012
     - el_version != "EL_27.0.0_LoRa_fix"
 
-- name: Verify EL Version is Valid for ReliaGATE 10-14 (Skipped = PASS)
+- name: Verify EL Version is Valid for ReliaGATE 10-14 (Skipped = PASS or Gateway is not a 10-14)
   fail: 
     msg: "For a ReliaGATE 10-14, the EL version must be EL_27.0.2 or EL_27.1.0 but was {{ el_version }}.  
           Contact Eurotech for instructions on installing the correct version of EL."
@@ -99,16 +99,16 @@
 ##Set variables based on ESF version
 - name: Set variables for ESF 7 Block
   block:
-    - name: Get ESF 7 Default Password (SKIP = ESF 6.2.0 detected)
+    - name: Get ESF 7 Default Password (SKIP = Use default for ESF 6.2.0)
       command: eth_serial_number
       register: eth_serial_number
       changed_when: false
 
-    - name: Save ESF 7 Default Password (SKIP = ESF 6.2.0 detected)
+    - name: Save ESF 7 Default Password (SKIP = Use default for ESF 6.2.0)
       set_fact:
         esf_password: "{{ eth_serial_number.stdout }}"
 
-    - name: Set API protocol for ESF 7 (SKIP = ESF 6.2.0 detected)
+    - name: Set API protocol for ESF 7 (SKIP = Use default for ESF 6.2.0)
       set_fact:
         esf_api_http_protocol: "https"
 
