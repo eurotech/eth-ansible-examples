@@ -6,7 +6,7 @@
 - name: start docker
   systemd:
     name: docker
-    state: started
+    state: restarted
     #enabled: yes #this doesn't work due to bug
 
 #Enable Docker

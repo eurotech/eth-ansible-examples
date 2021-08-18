@@ -3,27 +3,17 @@
   debug:
     msg: "Pre-ESF Setup"
 
-# #Firewall Workaround Setup
-# - name: Copy firewall workaround files
-#   copy: 
-#     src: "{{ item.src }}"
-#     dest: "{{ item.dest }}"
-#     mode: "{{ item.mode }}"
-#   with_items:
-#     - { src: firewall/addon-iptables, dest: /opt/firewall-docker-workaround/, mode: "0644" }
-#     - { src: firewall/firewall_cust, dest: /etc/init.d/, mode: "0755" }
-#     - { src: firewall/firewall_cust_aux, dest: /etc/init.d/, mode: "0755" }
-
-- name: start docker
-  systemd:
-    name: docker
-    state: started
-    #enabled: yes #this doesn't work due to bug
-
-#Enable Docker
-- name: enable docker start-at-boot
-  become: yes
-  shell: systemctl reenable docker
+#Firewall Workaround Setup (EFS 6.2.0 only)
+- name: "EFS 6.2.0: Copy firewall workaround files (SKIP = EFS 7)"
+  copy: 
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: "{{ item.mode }}"
+  with_items:
+    - { src: firewall/addon-iptables, dest: /opt/firewall-docker-workaround/, mode: "0644" }
+    - { src: firewall/firewall_cust, dest: /etc/init.d/, mode: "0755" }
+    - { src: firewall/firewall_cust_aux, dest: /etc/init.d/, mode: "0755" }
+  when: esf_major_version != "7"
 
 #Create Docker network
 - name: create docker network chirpbridge
