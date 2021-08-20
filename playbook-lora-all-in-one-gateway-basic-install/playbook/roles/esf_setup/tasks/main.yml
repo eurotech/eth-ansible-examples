@@ -165,19 +165,19 @@
     - (esf_api_response.json | to_json) is search("com.eurotech.framework.amq7")
   any_errors_fatal: true
 
-# #snapshot contains config for Raw MQTT Cloud Connection and Artemis MQTT Broker
-# - name: Apply Snapshot to ESF (ESF 7 HTTPS Method)
-#   uri:
-#     url: "https://127.0.0.1/services/configuration/v1/snapshots/_upload"
-#     user: "{{esf_username}}"
-#     password: "{{esf_password}}"
-#     status_code: 200
-#     force_basic_auth: yes
-#     validate_certs: no
-#     method: POST
-#     headers: 
-#       Content-Type: "application/xml" 
-#     body: "{{lookup('file', 'snapshots/LoRa_system_base_snapshot.xml', errors='strict')}}" 
+#snapshot contains config for Raw MQTT Cloud Connection and Artemis MQTT Broker
+- name: Apply Snapshot to ESF
+  uri:
+    url: "{{ esf_api_http_protocol }}://127.0.0.1/services/configuration/v1/snapshots/_upload"
+    user: "{{esf_username}}"
+    password: "{{esf_password}}"
+    status_code: 200
+    force_basic_auth: yes
+    validate_certs: no
+    method: POST
+    headers: 
+      Content-Type: "application/xml" 
+    body: "{{lookup('url', aws_url+'/snapshots/LoRa_system_base_snapshot.xml', errors='strict', split_lines=False)}}" 
 
 # ##Add Open Port 1883 for interface Chirpbridge to Firewall
 # #Get Current Firewall Config
