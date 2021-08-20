@@ -179,46 +179,46 @@
       Content-Type: "application/xml" 
     body: "{{lookup('url', aws_url+'/snapshots/LoRa_system_base_snapshot.xml', errors='strict', split_lines=False)}}" 
 
-# ##Add Open Port 1883 for interface Chirpbridge to Firewall
-# #Get Current Firewall Config
-# - name: Request Current Firewall Configuration from ESF (ESF 7 HTTPS Method)
-#   uri:
-#     url: "https://127.0.0.1/services/configuration/v1/configurableComponents/configurations/byPid/org.eclipse.kura.net.admin.FirewallConfigurationService"
-#     user: "{{esf_username}}"
-#     password: "{{esf_password}}"
-#     status_code: 200
-#     force_basic_auth: yes
-#     validate_certs: no
-#     method: GET
-#   register: firewall_config
+##Add Open Port 1883 for interface Chirpbridge to Firewall
+#Get Current Firewall Config
+- name: Get Current Firewall Configuration from ESF
+  uri:
+    url: "{{ esf_api_http_protocol }}://127.0.0.1/services/configuration/v1/configurableComponents/configurations/byPid/org.eclipse.kura.net.admin.FirewallConfigurationService"
+    user: "{{esf_username}}"
+    password: "{{esf_password}}"
+    status_code: 200
+    force_basic_auth: yes
+    validate_certs: no
+    method: GET
+  register: firewall_config
 
-# #Get Firewall Open Ports List
-# - name: Parse Firewall Open Ports List
-#   set_fact:
-#     firewall_open_ports: "{{ firewall_config.json.properties.get('firewall.open.ports') }}"
+#Get Firewall Open Ports List
+- name: Parse Firewall Open Ports List
+  set_fact:
+    firewall_open_ports: "{{ firewall_config.json.properties.get('firewall.open.ports') }}"
 
-# - name: Update Firewall Open Ports List (SKIP = port already opened)
-#   set_fact: 
-#     firewall_open_ports: "{{ firewall_open_ports }};1883,tcp,0.0.0.0/0,chirpbridge,,,,#"
-#   when: firewall_open_ports is not search("1883,tcp,0.0.0.0/0,chirpbridge,,,,#")
-#   register: firewall_ports_update
+- name: Update Firewall Open Ports List (SKIP = port already opened)
+  set_fact: 
+    firewall_open_ports: "{{ firewall_open_ports }};1883,tcp,0.0.0.0/0,chirpbridge,,,,#"
+  when: firewall_open_ports is not search("1883,tcp,0.0.0.0/0,chirpbridge,,,,#")
+  register: firewall_ports_update
 
-# - name: Apply firewall update to gateway (ESF 7 HTTPS Method) (SKIP = port already open)
-#   uri:
-#     url: "https://127.0.0.1/services/configuration/v1/configurableComponents/configurations/byPid/org.eclipse.kura.net.admin.FirewallConfigurationService/_update"
-#     user: "{{esf_username}}"
-#     password: "{{esf_password}}"
-#     status_code: 200
-#     force_basic_auth: yes
-#     validate_certs: no
-#     method: POST
-#     body_format: json
-#     body:
-#       takeSnapshot: true
-#       componentConfigurationRequest:
-#         properties: 
-#           firewall.open.ports: "{{ firewall_open_ports }}"
-#   when: firewall_ports_update is not skipped
+- name: Apply firewall update to gateway (SKIP = port already open)
+  uri:
+    url: "{{ esf_api_http_protocol }}://127.0.0.1/services/configuration/v1/configurableComponents/configurations/byPid/org.eclipse.kura.net.admin.FirewallConfigurationService/_update"
+    user: "{{esf_username}}"
+    password: "{{esf_password}}"
+    status_code: 200
+    force_basic_auth: yes
+    validate_certs: no
+    method: POST
+    body_format: json
+    body:
+      takeSnapshot: true
+      componentConfigurationRequest:
+        properties: 
+          firewall.open.ports: "{{ firewall_open_ports }}"
+  when: firewall_ports_update is not skipped
 
 #     #apply custom ESF settings
 # - name: copy custom ESF configuration files
