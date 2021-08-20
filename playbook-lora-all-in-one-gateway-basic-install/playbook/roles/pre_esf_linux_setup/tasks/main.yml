@@ -23,7 +23,7 @@
 #     mode: "{{ item.mode }}"
 #     checksum: "md5:{{ item.checksum }}"
 #   with_items:
-#     - { src: "{{ aws_url }}/firewall/addon-iptables", dest: /opt/firewall-docker-workaround/, mode: "0644", checksum: "{{ addon-iptables_md5 }}"}
+#     - { src: "{{ aws_url }}/firewall/addon-iptables", dest: /opt/firewall-docker-workaround/, mode: "0644", checksum: "{{ addon_iptables_md5 }}"}
 #     - { src: "{{ aws_url }}/firewall/firewall_cust", dest: /etc/init.d/, mode: "0755", checksum: "{{ firewall_cust_md5 }}" }
 #     - { src: "{{ aws_url }}/firewall/firewall_cust_aux", dest: /etc/init.d/, mode: "0755", checksum: "{{ firewall_cust_aux_md5 }}" }
 #   when: esf_major_version != "7"

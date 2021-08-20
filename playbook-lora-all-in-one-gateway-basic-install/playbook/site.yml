@@ -26,7 +26,7 @@
     aws_url: "https://eth-inc-sw.s3.amazonaws.com/lora/ansible-lora-install-support-files"
 
     #MD5's of files to download
-    addon-iptables_md5: "c0e7819c458f5ba39fb82601060bafbb"
+    addon_iptables_md5: "c0e7819c458f5ba39fb82601060bafbb"
     firewall_cust_md5: "d3f332b02ed14b72d1b211bddd3fceab"
     firewall_cust_aux_md5: "aaea55d505d2d61d17d36fef8107a493"
 
