@@ -147,23 +147,30 @@
     msg: "ESF API Call to install package returned unexpected response: {{ esf_api_response.content }} ***FULL DEBUG INFO***: {{ esf_api_response }}"
   when: esf_api_response.content is not search("REQUEST_RECEIVED")
 
-- name: Wait for packages to be installed (can take up to 30 seconds)
-  uri: #get list of installed packages
-    url: "{{ esf_api_http_protocol }}://127.0.0.1/services/deploy/v1/"
-    user: "{{esf_username}}"
-    password: "{{esf_password}}"
-    status_code: 200
-    force_basic_auth: yes
-    validate_certs: no
-    method: GET
-    return_content: yes
-  register: esf_api_response
-  retries: 15
-  delay: 2
-  until: #list indicates implicit AND 
-    - (esf_api_response.json | to_json) is search("org.eclipse.kura.cloudconnection.raw.mqtt.provider")
-    - (esf_api_response.json | to_json) is search("com.eurotech.framework.amq7")
-  any_errors_fatal: true
+- name: package install confirmation
+  block:
+    - name: Wait for packages to be installed (can take up to 30 seconds)
+      uri: #get list of installed packages
+        url: "{{ esf_api_http_protocol }}://127.0.0.1/services/deploy/v1/"
+        user: "{{esf_username}}"
+        password: "{{esf_password}}"
+        status_code: 200
+        force_basic_auth: yes
+        validate_certs: no
+        method: GET
+        return_content: yes
+      register: esf_api_response
+      retries: 15
+      delay: 2
+      until: #list indicates implicit AND 
+        - (esf_api_response.json | to_json) is search("org.eclipse.kura.cloudconnection.raw.mqtt.provider")
+        - (esf_api_response.json | to_json) is search("com.eurotech.framework.amq7")
+      any_errors_fatal: true
+
+  rescue:
+    - name: Packages failed to install within 30 seconds
+      fail:
+        msg: "FAILURE: Packages failed to install within 30 seconds. Check EFS configuration and log for errors."
 
 #snapshot contains config for Raw MQTT Cloud Connection and Artemis MQTT Broker
 - name: Apply Snapshot to ESF
