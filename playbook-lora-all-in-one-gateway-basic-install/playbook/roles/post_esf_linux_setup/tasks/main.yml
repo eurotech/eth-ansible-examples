@@ -15,6 +15,8 @@
     #redis
 - name: pull redis
   command: docker pull redis:6.2.1-alpine3.13
+  register: docker_result
+  changed_when: docker_result.stdout is not search("Image is up to date")
 
 - name: create redis data volume
   command: docker volume create redis-data-chirpstack
@@ -25,7 +27,7 @@
 - name: redis server start confirmation
   block:
     - name: wait for redis server to start up (this can take up to 1 minute)
-      command: docker logs redis
+      command: docker logs redis-chirpstack
       register: redislogs
       retries: 6
       delay: 10
@@ -38,11 +40,22 @@
         msg: "FAILURE: Redis server failed to start within 1 minute. Check TE Sensor Demo Kit Assembly Instructions for troubleshooting steps to take."
     
     #postgres
-- name: copy support files for PostGreSQL 
-  copy:
-    src: postgres_init/
-    dest: /etc/postgres
+- name: Ensure directory exists for PostGreSQL support files
+  file:
+    path: /etc/postgres_chirpstack/
+    state: directory
+
+- name: Download support files for PostGreSQL
+  get_url: 
+    url: "{{ item.src }}"
+    dest: /etc/postgres_chirpstack/
     mode: "0644"
+    checksum: "md5:{{ item.checksum }}"
+  with_items:
+    - { src: "{{ aws_url }}/postgres_init/001-init-chirpstack_ns.sh", checksum: "{{ postgres_init_1_md5 }}"}
+    - { src: "{{ aws_url }}/postgres_init/002-init-chirpstack_as.sh", checksum: "{{ postgres_init_2_md5 }}"}
+    - { src: "{{ aws_url }}/postgres_init/003-chirpstack_as_trgm.sh", checksum: "{{ postgres_init_3_md5 }}"}
+    - { src: "{{ aws_url }}/postgres_init/004-chirpstack_as_hstore.sh", checksum: "{{ postgres_init_4_md5 }}"}
 
 - name: pull postgres
   command: docker pull postgres:9.6.21-alpine
@@ -51,12 +64,12 @@
   command: docker volume create postgres-data-chirpstack
     
 - name: start postgres container
-  command: docker run --name postgres-chirpstack --network "chirpbridge" --ip 172.18.0.3 -v postgres-data-chirpstack:/var/lib/postgresql/data -v /etc/postgres:/docker-entrypoint-initdb.d -e POSTGRES_PASSWORD=root -d --restart unless-stopped postgres:9.6.21-alpine
+  command: docker run --name postgres-chirpstack --network "chirpbridge" --ip 172.18.0.3 -v postgres-data-chirpstack:/var/lib/postgresql/data -v /etc/postgres_chirpstack:/docker-entrypoint-initdb.d -e POSTGRES_PASSWORD=root -d --restart unless-stopped postgres:9.6.21-alpine
 
 - name: postgres server start confirmation
   block:
     - name: wait for Postgres server to start up (this can take up to 3 minutes)
-      command: docker logs postgres
+      command: docker logs postgres-chirpstack
       register: postgreslogs
       retries: 18
       delay: 10
@@ -78,11 +91,20 @@
     dest: /etc/monit.d/
     mode: preserve
 
-- name: copy support files for packet forwarder 
-  copy:
-    src: packet_forwarder/
-    dest: /opt/lora
+- name: Ensure directory exists for LoRa radio configuration files
+  file:
+    path: /opt/lora/
+    state: directory
+
+- name: Download LoRa radio configuration files
+  get_url: 
+    url: "{{ item.src }}"
+    dest: /opt/lora/
     mode: "0644"
+    checksum: "md5:{{ item.checksum }}"
+  with_items:
+    - { src: "{{ aws_url }}/packet_forwarder/global_conf.json", checksum: "{{ global_conf_md5 }}"}
+    - { src: "{{ aws_url }}/packet_forwarder/local_conf.json", checksum: "{{ local_conf_md5 }}"}
 
 - name: start packet forwarder
   systemd:

@@ -29,6 +29,12 @@
     addon_iptables_md5: "c0e7819c458f5ba39fb82601060bafbb"
     firewall_cust_md5: "d3f332b02ed14b72d1b211bddd3fceab"
     firewall_cust_aux_md5: "aaea55d505d2d61d17d36fef8107a493"
+    postgres_init_1_md5: "52d9b10a4d6323e1327a23c8577854ed"
+    postgres_init_2_md5: "24d4adb3052298d9c338350a38eb738a"
+    postgres_init_3_md5: "55a43197cdb8fa034d577c77feb5669f"
+    postgres_init_4_md5: "7902d43d6171fb91b347a13042beee61"
+    global_conf_md5: "20e34722d62da60474cab1d02c9123eb"
+    local_conf_md5: "d9762eda1a1403642e8df4b168dfa4d3"
 
   #pre_tasks:
 
@@ -37,7 +43,7 @@
     - reset_environment
     - pre_esf_linux_setup
     - esf_setup
-    #- post_esf_linux_setup
+    - post_esf_linux_setup
     #- chirpstack_install
     #- chirpstack_configure
 
