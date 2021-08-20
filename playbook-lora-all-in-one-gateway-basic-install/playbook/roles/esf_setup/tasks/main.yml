@@ -52,102 +52,64 @@
 #     state: absent
 #   with_items: "{{ esf_snapshots.files }}"
 
-    #copy DPs
-- name: copy deployment packages 
-  copy:
-    src: packages/
-    dest: /opt/eurotech/esf/packages
-    mode: "0644"
-  register: copy_dps
+#     #copy DPs
+# - name: copy deployment packages 
+#   copy:
+#     src: packages/
+#     dest: /opt/eurotech/esf/packages
+#     mode: "0644"
+#   register: copy_dps
 
-    #modify dpa.properties (or create) if it doesn't exist
-- name: add deployment packages to ESF
-  lineinfile:
-    path: /opt/eurotech/esf/packages/dpa.properties
-    line: "{{ item.line }}"
-    create: yes
-    mode: "0644"
-  with_items:
-    - { line: 'com.eurotech.framework.amq7=file\:/opt/eurotech/esf/packages/com.eurotech.framework.amq7_1.1.0.dp' }
-    - { line: 'org.eclipse.kura.cloudconnection.raw.mqtt.provider=file\:/opt/eurotech/esf/packages/org.eclipse.kura.cloudconnection.raw.mqtt.provider_1.0.0.dp' }
-  register: modify_dpa
+#     #modify dpa.properties (or create) if it doesn't exist
+# - name: add deployment packages to ESF
+#   lineinfile:
+#     path: /opt/eurotech/esf/packages/dpa.properties
+#     line: "{{ item.line }}"
+#     create: yes
+#     mode: "0644"
+#   with_items:
+#     - { line: 'com.eurotech.framework.amq7=file\:/opt/eurotech/esf/packages/com.eurotech.framework.amq7_1.1.0.dp' }
+#     - { line: 'org.eclipse.kura.cloudconnection.raw.mqtt.provider=file\:/opt/eurotech/esf/packages/org.eclipse.kura.cloudconnection.raw.mqtt.provider_1.0.0.dp' }
+#   register: modify_dpa
 
-- name: Restart Kura if deployment package(s) were changed
-  block:
-  #Bounce Kura
-  - name: Restart ESF
-    systemd:
-      name: kura
-      state: restarted
+# - name: Restart Kura if deployment package(s) were changed
+#   block:
+#   #Bounce Kura
+#   - name: Restart ESF
+#     systemd:
+#       name: kura
+#       state: restarted
 
-  #Get current time (log start time)
-  - name: save current time
-    command: 'date "+%Y-%m-%d %H:%M:%S"'
-    register: logstarttime
+#   #Get current time (log start time)
+#   - name: save current time
+#     command: 'date "+%Y-%m-%d %H:%M:%S"'
+#     register: logstarttime
 
-  #Set fact for log start time
-  - name: parse current time
-    set_fact:
-      log_start_time: "{{ logstarttime.stdout }}"
+#   #Set fact for log start time
+#   - name: parse current time
+#     set_fact:
+#       log_start_time: "{{ logstarttime.stdout }}"
 
-  - name: kura restart confirmation
-    block:
-      - name: wait for ESF to start up (this can take up to 4 minutes)
-        command: 'journalctl --since "{{log_start_time}}"'
-        register: systemlogs
-        retries: 24
-        delay: 10
-        until: systemlogs.stderr.find("Registering SelfConfiguringComponent - org.eclipse.kura.web.Console....Done") != -1 or systemlogs.stdout.find("Registering SelfConfiguringComponent - org.eclipse.kura.web.Console....Done") != -1
-        any_errors_fatal: true
+#   - name: kura restart confirmation
+#     block:
+#       - name: wait for ESF to start up (this can take up to 4 minutes)
+#         command: 'journalctl --since "{{log_start_time}}"'
+#         register: systemlogs
+#         retries: 24
+#         delay: 10
+#         until: systemlogs.stderr.find("Registering SelfConfiguringComponent - org.eclipse.kura.web.Console....Done") != -1 or systemlogs.stdout.find("Registering SelfConfiguringComponent - org.eclipse.kura.web.Console....Done") != -1
+#         any_errors_fatal: true
 
-    rescue:
-      - name: ESF failed to restart within 4 minutes
-        fail:
-          msg: "FAILURE: ESF failed to restart within 4 minutes. Check ESF log for errors."
+#     rescue:
+#       - name: ESF failed to restart within 4 minutes
+#         fail:
+#           msg: "FAILURE: ESF failed to restart within 4 minutes. Check ESF log for errors."
   
-  when: copy_dps.changed or modify_dpa.changed #block when
+#   when: copy_dps.changed or modify_dpa.changed #block when
 
-#snapshot contains config for Raw MQTT Cloud Connection and Artemis MQTT Broker
-- name: Apply Snapshot to ESF (ESF 7 HTTPS Method)
+- name: Install Raw MQTT Package
   uri:
-    url: "https://127.0.0.1/services/configuration/v1/snapshots/_upload"
-    user: "{{esf_username}}"
-    password: "{{esf_password}}"
-    status_code: 200
-    force_basic_auth: yes
-    validate_certs: no
-    method: POST
-    headers: 
-      Content-Type: "application/xml" 
-    body: "{{lookup('file', 'snapshots/LoRa_system_base_snapshot.xml', errors='strict')}}" 
-
-##Add Open Port 1883 for interface Chirpbridge to Firewall
-#Get Current Firewall Config
-- name: Request Current Firewall Configuration from ESF (ESF 7 HTTPS Method)
-  uri:
-    url: "https://127.0.0.1/services/configuration/v1/configurableComponents/configurations/byPid/org.eclipse.kura.net.admin.FirewallConfigurationService"
-    user: "{{esf_username}}"
-    password: "{{esf_password}}"
-    status_code: 200
-    force_basic_auth: yes
-    validate_certs: no
-    method: GET
-  register: firewall_config
-
-#Get Firewall Open Ports List
-- name: Parse Firewall Open Ports List
-  set_fact:
-    firewall_open_ports: "{{ firewall_config.json.properties.get('firewall.open.ports') }}"
-
-- name: Update Firewall Open Ports List (SKIP = port already opened)
-  set_fact: 
-    firewall_open_ports: "{{ firewall_open_ports }};1883,tcp,0.0.0.0/0,chirpbridge,,,,#"
-  when: firewall_open_ports is not search("1883,tcp,0.0.0.0/0,chirpbridge,,,,#")
-  register: firewall_ports_update
-
-- name: Apply firewall update to gateway (ESF 7 HTTPS Method) (SKIP = port already open)
-  uri:
-    url: "https://127.0.0.1/services/configuration/v1/configurableComponents/configurations/byPid/org.eclipse.kura.net.admin.FirewallConfigurationService/_update"
+    url: "{{ esf_api_http_protocol }}://127.0.0.1/services/deploy/v1/_install"
     user: "{{esf_username}}"
     password: "{{esf_password}}"
     status_code: 200
@@ -156,11 +118,107 @@
     method: POST
     body_format: json
     body:
-      takeSnapshot: true
-      componentConfigurationRequest:
-        properties: 
-          firewall.open.ports: "{{ firewall_open_ports }}"
-  when: firewall_ports_update is not skipped
+      url: "{{ aws_url }}/packages/com.eurotech.framework.amq7_1.1.0.dp"
+    return_content: yes
+  register: esf_api_response
+
+- name: Confirm Package is Installing (SKIP = Pass)
+  fail:
+    msg: "ESF API Call to install package returned unexpected response: {{ esf_api_response.content }} ***FULL DEBUG INFO***: {{ esf_api_response }}"
+  when: esf_api_response.content is not search("REQUEST_RECEIVED")
+
+- name: Install AMQ7 Package
+  uri:
+    url: "{{ esf_api_http_protocol }}://127.0.0.1/services/deploy/v1/_install"
+    user: "{{esf_username}}"
+    password: "{{esf_password}}"
+    status_code: 200
+    force_basic_auth: yes
+    validate_certs: no
+    method: POST
+    body_format: json
+    body:
+      url: "{{ aws_url }}/packages/org.eclipse.kura.cloudconnection.raw.mqtt.provider_1.0.0.dp"
+    return_content: yes
+  register: esf_api_response
+
+- name: Confirm Package is Installing (SKIP = Pass)
+  fail:
+    msg: "ESF API Call to install package returned unexpected response: {{ esf_api_response.content }} ***FULL DEBUG INFO***: {{ esf_api_response }}"
+  when: esf_api_response.content is not search("REQUEST_RECEIVED")
+
+- name: Wait for packages to be installed (can take up to 30 seconds)
+  uri: #get list of installed packages
+    url: "{{ esf_api_http_protocol }}://127.0.0.1/services/deploy/v1/"
+    user: "{{esf_username}}"
+    password: "{{esf_password}}"
+    status_code: 200
+    force_basic_auth: yes
+    validate_certs: no
+    method: GET
+    return_content: yes
+  register: esf_api_response
+  retries: 15
+  delay: 2
+  until: #list indicates implicit AND 
+    - (esf_api_response.json | to_json) is search("org.eclipse.kura.cloudconnection.raw.mqtt.provider")
+    - (esf_api_response.json | to_json) is search("com.eurotech.framework.amq7")
+  any_errors_fatal: true
+
+# #snapshot contains config for Raw MQTT Cloud Connection and Artemis MQTT Broker
+# - name: Apply Snapshot to ESF (ESF 7 HTTPS Method)
+#   uri:
+#     url: "https://127.0.0.1/services/configuration/v1/snapshots/_upload"
+#     user: "{{esf_username}}"
+#     password: "{{esf_password}}"
+#     status_code: 200
+#     force_basic_auth: yes
+#     validate_certs: no
+#     method: POST
+#     headers: 
+#       Content-Type: "application/xml" 
+#     body: "{{lookup('file', 'snapshots/LoRa_system_base_snapshot.xml', errors='strict')}}" 
+
+# ##Add Open Port 1883 for interface Chirpbridge to Firewall
+# #Get Current Firewall Config
+# - name: Request Current Firewall Configuration from ESF (ESF 7 HTTPS Method)
+#   uri:
+#     url: "https://127.0.0.1/services/configuration/v1/configurableComponents/configurations/byPid/org.eclipse.kura.net.admin.FirewallConfigurationService"
+#     user: "{{esf_username}}"
+#     password: "{{esf_password}}"
+#     status_code: 200
+#     force_basic_auth: yes
+#     validate_certs: no
+#     method: GET
+#   register: firewall_config
+
+# #Get Firewall Open Ports List
+# - name: Parse Firewall Open Ports List
+#   set_fact:
+#     firewall_open_ports: "{{ firewall_config.json.properties.get('firewall.open.ports') }}"
+
+# - name: Update Firewall Open Ports List (SKIP = port already opened)
+#   set_fact: 
+#     firewall_open_ports: "{{ firewall_open_ports }};1883,tcp,0.0.0.0/0,chirpbridge,,,,#"
+#   when: firewall_open_ports is not search("1883,tcp,0.0.0.0/0,chirpbridge,,,,#")
+#   register: firewall_ports_update
+
+# - name: Apply firewall update to gateway (ESF 7 HTTPS Method) (SKIP = port already open)
+#   uri:
+#     url: "https://127.0.0.1/services/configuration/v1/configurableComponents/configurations/byPid/org.eclipse.kura.net.admin.FirewallConfigurationService/_update"
+#     user: "{{esf_username}}"
+#     password: "{{esf_password}}"
+#     status_code: 200
+#     force_basic_auth: yes
+#     validate_certs: no
+#     method: POST
+#     body_format: json
+#     body:
+#       takeSnapshot: true
+#       componentConfigurationRequest:
+#         properties: 
+#           firewall.open.ports: "{{ firewall_open_ports }}"
+#   when: firewall_ports_update is not skipped
 
 #     #apply custom ESF settings
 # - name: copy custom ESF configuration files

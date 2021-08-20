@@ -23,7 +23,7 @@
     esf_password: "admin" #EFS 6.2.0: "admin"; EFS 7: serial number
     
     #AWS file storage base address (does NOT include trailing slash)
-    aws_url: "https://eth-inc-sw.s3.amazonaws.com/lora/ansible-lora-install-support-files"
+    aws_url: "http://eth-inc-sw.s3.amazonaws.com/lora/ansible-lora-install-support-files"
 
     #MD5's of files to download
     addon_iptables_md5: "c0e7819c458f5ba39fb82601060bafbb"
@@ -34,9 +34,9 @@
 
   roles:
     - validate_environment
-    - reset_environment
-    - pre_esf_linux_setup
-    #- esf_setup
+    #- reset_environment
+    #- pre_esf_linux_setup
+    - esf_setup
     #- post_esf_linux_setup
     #- chirpstack_install
     #- chirpstack_configure
