@@ -14,8 +14,8 @@
   become: yes
   shell: systemctl reenable docker
 
-##Remove existing docker containers and volumes. Remove chirpstack network
-- name: stop all docker containers
+##Remove existing docker chirpstack containers and volumes. Remove chirpstack network
+- name: stop all docker chirpstack containers
   command: "docker stop {{ item }}"
   register: docker_result
   loop: "{{ docker_image_names }}"
@@ -24,7 +24,7 @@
     - docker_result.stderr is not search("No such container:")
   changed_when: docker_result.stderr is not search("No such container:")
 
-- name: remove all docker containers
+- name: remove all docker chirpstack containers
   command: "docker rm {{ item }}"
   register: docker_result
   loop: "{{ docker_image_names }}"
@@ -33,7 +33,7 @@
     - docker_result.stderr is not search("No such container:")
   changed_when: docker_result.stderr is not search("No such container:")
 
-- name: remove all docker volumes
+- name: remove all docker chirpstack volumes
   command: "docker volume rm {{ item }}"
   register: docker_result
   loop: "{{ docker_volume_names }}"
@@ -42,7 +42,7 @@
     - docker_result.stderr is not search("No such volume:")
   changed_when: docker_result.stderr is not search("No such volume:")
 
-- name: remove chirpstack docker network
+- name: remove docker chirpstack network
   command: docker network rm chirpbridge
   register: docker_result
   failed_when:
