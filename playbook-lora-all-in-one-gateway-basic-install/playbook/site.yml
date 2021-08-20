@@ -15,11 +15,20 @@
       - redis-data-chirpstack
       - postgres-data-chirpstack
     esf_username: "admin"
+    
     #EFS version specific variables
     #These variables are set to a default of EFS 6.2.0. 
     #If EFS 7 is in use, they will be changed (in the validate_environment role)
     esf_api_http_protocol: "http" #EFS 6.2.0: http; EFS 7: https
     esf_password: "admin" #EFS 6.2.0: "admin"; EFS 7: serial number
+    
+    #AWS file storage base address (does NOT include trailing slash)
+    aws_url: "https://eth-inc-sw.s3.amazonaws.com/lora/ansible-lora-install-support-files"
+
+    #MD5's of files to download
+    addon-iptables_md5: "c0e7819c458f5ba39fb82601060bafbb"
+    firewall_cust_md5: "d3f332b02ed14b72d1b211bddd3fceab"
+    firewall_cust_aux_md5: "aaea55d505d2d61d17d36fef8107a493"
 
   #pre_tasks:
 
