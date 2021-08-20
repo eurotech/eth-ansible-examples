@@ -59,6 +59,8 @@
 
 - name: pull postgres
   command: docker pull postgres:9.6.21-alpine
+  register: docker_result
+  changed_when: docker_result.stdout is not search("Image is up to date")
 
 - name: create postgres data volume
   command: docker volume create postgres-data-chirpstack
