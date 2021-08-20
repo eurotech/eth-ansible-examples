@@ -4,23 +4,43 @@
     msg: "Chirpstack Install"
 
     #chirpstack
-- name: copy configuration files for Chirpstack apps 
-  copy:
-    src: chirpstack_config/
-    dest: /etc
+- name: Ensure directories exists for chirpstack app config files
+  file:
+    path: "/etc/{{ item }}"
+    state: directory
+  with_items:
+    - "chirpstack-gateway-bridge"
+    - "chirpstack-network-server"
+    - "chirpstack-application-server"
+
+- name: Download chirpstack app config files
+  get_url: 
+    url: "{{ item.src }}"
+    dest: "/etc/{{ item.dest }}"
     mode: "0644"
+    checksum: "md5:{{ item.checksum }}"
+  with_items:
+    - { src: "{{ aws_url }}/chirpstack_config/chirpstack-application-server/chirpstack-application-server.toml", dest: "chirpstack-application-server", checksum: "{{ cas_config_md5 }}"}
+    - { src: "{{ aws_url }}/chirpstack_config/chirpstack-network-server/chirpstack-network-server.toml", dest: "chirpstack-network-server", checksum: "{{ cns_config_md5 }}"}
+    - { src: "{{ aws_url }}/chirpstack_config/chirpstack-gateway-bridge/chirpstack-gateway-bridge.toml", dest: "chirpstack-gateway-bridge", checksum: "{{ cgb_config_md5 }}"}
 
 - name: pull chirpstack gateway bridge
   command: docker pull public.ecr.aws/n6v5k0e3/chirpstack-gateway-bridge:3.10.0-arm64v8 
+  register: docker_result
+  changed_when: docker_result.stdout is not search("Image is up to date")
 
 - name: pull chirpstack network server
   command: docker pull public.ecr.aws/n6v5k0e3/chirpstack-network-server:3.12.3-arm64v8 
+  register: docker_result
+  changed_when: docker_result.stdout is not search("Image is up to date")
 
 - name: pull chirpstack application server
   command: docker pull public.ecr.aws/n6v5k0e3/chirpstack-application-server:3.14.0-arm64v8
+  register: docker_result
+  changed_when: docker_result.stdout is not search("Image is up to date")
 
 - name: start chirpstack gateway bridge container
-  command: docker run --name chirpstack-gateway-bridge -p 1700:1700/udp --add-host mqttserver:172.18.0.1 --network "chirpbridge" --ip 172.18.0.4 -v /etc/chirpstack-gateway-bridge/:/etc/chirpstack-gateway-bridge -d --restart unless-stopped public.ecr.aws/n6v5k0e3/chirpstack-gateway-bridge:3.10.0-arm64v8 
+  command: docker run --name chirpstack-gateway-bridge -p 1700:1700/udp --add-host mqttserver:172.18.0.1 --network "chirpbridge" --ip 172.18.0.4 -v /etc/chirpstack-gateway-bridge:/etc/chirpstack-gateway-bridge -d --restart unless-stopped public.ecr.aws/n6v5k0e3/chirpstack-gateway-bridge:3.10.0-arm64v8 
 
 - name: start chirpstack network server container
   command: docker run --name chirpstack-network-server --add-host mqttserver:172.18.0.1 --network "chirpbridge" --ip 172.18.0.5 -v /etc/chirpstack-network-server:/etc/chirpstack-network-server -d --restart unless-stopped public.ecr.aws/n6v5k0e3/chirpstack-network-server:3.12.3-arm64v8 

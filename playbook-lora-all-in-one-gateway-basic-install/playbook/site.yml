@@ -35,6 +35,9 @@
     postgres_init_4_md5: "7902d43d6171fb91b347a13042beee61"
     global_conf_md5: "20e34722d62da60474cab1d02c9123eb"
     local_conf_md5: "d9762eda1a1403642e8df4b168dfa4d3"
+    cas_config_md5: "819af396274a49b52e748352b4127438"
+    cns_config_md5: "03d1f593f434cc47b57c0a7e056b9279"
+    cgb_config_md5: "d436ceb9fcf745e4a7e70bc76b3d6f9c"
 
   #pre_tasks:
 
@@ -44,7 +47,7 @@
     - pre_esf_linux_setup
     - esf_setup
     - post_esf_linux_setup
-    #- chirpstack_install
+    - chirpstack_install
     #- chirpstack_configure
 
   #post_tasks:
