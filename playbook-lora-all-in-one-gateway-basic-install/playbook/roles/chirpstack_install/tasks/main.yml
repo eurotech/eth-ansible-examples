@@ -57,6 +57,7 @@
       delay: 10
       until: caslogs.stderr.find("starting join-server api") != -1 or caslogs.stdout.find("starting join-server api") != -1
       any_errors_fatal: true
+      changed_when: false
 
   rescue:
     - name: Chirpstack application server failed to start within 3 minutes
