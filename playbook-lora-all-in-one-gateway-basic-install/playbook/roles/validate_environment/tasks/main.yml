@@ -129,3 +129,17 @@
   fail:
     msg: "Docker must be installed! Install docker, restart gateway, and run playbook again."
   when: docker_check.stderr is search("command not found")
+
+# Create the version file
+- name: Ensure directory exists for the version file
+  file:
+    path: /opt/lora/installer_version
+    state: directory
+
+- name: Download installer version file
+  get_url: 
+    url: "{{ aws_url }}/installer_script_version/lora-installer-version"
+    dest: /opt/lora/installer_version/lora-installer-version
+    mode: "0644"
+    checksum: "md5:{{ lora_installer_version_md5 }}"
+    force: yes #If file already exists, still download file and replace if contents are different

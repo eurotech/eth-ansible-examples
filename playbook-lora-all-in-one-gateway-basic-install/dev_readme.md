@@ -7,6 +7,7 @@ ToDo:
 * Document passing in custom ESF credentials
 * Adjust ESF major version parsing to be regex (if possible)
 * document that docker logging is NOT enabled if daemon.json already exists!
+* document lora installer file version
 
 MQTT Broker Credentials
 UN: LoRaMQTTUser

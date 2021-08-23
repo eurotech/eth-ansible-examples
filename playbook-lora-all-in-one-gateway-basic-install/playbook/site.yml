@@ -39,6 +39,7 @@
     cns_config_md5: "03d1f593f434cc47b57c0a7e056b9279"
     cgb_config_md5: "d436ceb9fcf745e4a7e70bc76b3d6f9c"
     docker_daemon_json_md5: "a6ba49cf41e8782fbe035a9a28e8fe69"
+    lora_installer_version_md5: "2c23a95d70114569e0905d9676d3ffa6"
 
   #pre_tasks:
 
