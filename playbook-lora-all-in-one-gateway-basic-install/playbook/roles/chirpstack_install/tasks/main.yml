@@ -19,6 +19,7 @@
     dest: "/etc/{{ item.dest }}"
     mode: "0644"
     checksum: "md5:{{ item.checksum }}"
+    force: yes #If file already exists, still download file and replace if contents are different
   with_items:
     - { src: "{{ aws_url }}/chirpstack_config/chirpstack-application-server/chirpstack-application-server.toml", dest: "chirpstack-application-server", checksum: "{{ cas_config_md5 }}"}
     - { src: "{{ aws_url }}/chirpstack_config/chirpstack-network-server/chirpstack-network-server.toml", dest: "chirpstack-network-server", checksum: "{{ cns_config_md5 }}"}

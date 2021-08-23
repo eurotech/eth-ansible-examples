@@ -52,6 +52,7 @@
     dest: /etc/postgres_chirpstack/
     mode: "0644"
     checksum: "md5:{{ item.checksum }}"
+    force: yes #If file already exists, still download file and replace if contents are different
   with_items:
     - { src: "{{ aws_url }}/postgres_init/001-init-chirpstack_ns.sh", checksum: "{{ postgres_init_1_md5 }}"}
     - { src: "{{ aws_url }}/postgres_init/002-init-chirpstack_as.sh", checksum: "{{ postgres_init_2_md5 }}"}
@@ -106,6 +107,7 @@
     dest: /opt/lora/
     mode: "0644"
     checksum: "md5:{{ item.checksum }}"
+    force: yes #If file already exists, still download file and replace if contents are different
   with_items:
     - { src: "{{ aws_url }}/packet_forwarder/global_conf.json", checksum: "{{ global_conf_md5 }}"}
     - { src: "{{ aws_url }}/packet_forwarder/local_conf.json", checksum: "{{ local_conf_md5 }}"}
