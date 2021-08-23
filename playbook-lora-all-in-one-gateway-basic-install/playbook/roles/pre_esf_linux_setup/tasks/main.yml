@@ -31,6 +31,22 @@
 #     - { src: "{{ aws_url }}/firewall/firewall_cust_aux", dest: /etc/init.d/, mode: "0755", checksum: "{{ firewall_cust_aux_md5 }}" }
 #   when: esf_major_version != "7"
 
+# Docker Configuration for Log Rotation
+- name: Download docker daemon config file (only if it doesn't exist already)
+  get_url: 
+    url: "{{ aws_url }}/docker_config/daemon.json"
+    dest: "/etc/docker/daemon.json"
+    mode: "0644"
+    checksum: "md5:{{ docker_daemon_json_md5 }}"
+    force: no #If file already exists, download-compare-replace operation will not be executed
+  register: get_url_results
+  
+# If docker daemon config was changed, reload docker to apply changes
+- name: Reload docker to apply docker daemon config changes (SKIP = config wasn't changed)
+  systemd:
+    name: docker
+    state: reloaded
+  when: get_url_results.changed #skip if daemon.json wasn't changed in previous task
 
 #Create Docker network
 - name: create docker network chirpbridge
