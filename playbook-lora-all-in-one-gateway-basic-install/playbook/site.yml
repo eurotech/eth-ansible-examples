@@ -48,7 +48,7 @@
     - esf_setup
     - post_esf_linux_setup
     - chirpstack_install
-    #- chirpstack_configure
+    - chirpstack_configure
 
   #post_tasks:
        
