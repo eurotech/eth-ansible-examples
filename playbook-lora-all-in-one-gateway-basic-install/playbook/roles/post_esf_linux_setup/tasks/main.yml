@@ -13,7 +13,7 @@
 #LoRa setup
     
     #redis
-- name: pull redis
+- name: pull redis image from ECR
   command: docker pull redis:6.2.1-alpine3.13
   register: docker_result
   changed_when: docker_result.stdout is not search("Image is up to date")
@@ -24,7 +24,7 @@
 - name: start redis container
   command: docker run --name redis-chirpstack --network "chirpbridge" --ip 172.18.0.2 -v redis-data-chirpstack:/data -d --restart unless-stopped redis:6.2.1-alpine3.13 redis-server --appendonly yes
 
-- name: redis server start confirmation
+- name: redis server start confirmation block
   block:
     - name: wait for redis server to start up (this can take up to 1 minute)
       command: docker logs redis-chirpstack
@@ -59,7 +59,7 @@
     - { src: "{{ aws_url }}/postgres_init/003-chirpstack_as_trgm.sh", checksum: "{{ postgres_init_3_md5 }}"}
     - { src: "{{ aws_url }}/postgres_init/004-chirpstack_as_hstore.sh", checksum: "{{ postgres_init_4_md5 }}"}
 
-- name: pull postgres
+- name: pull postgres image from ECR
   command: docker pull postgres:9.6.21-alpine
   register: docker_result
   changed_when: docker_result.stdout is not search("Image is up to date")
@@ -116,9 +116,12 @@
   systemd:
     name: lora-packet-forwarder
     state: restarted
-    #enabled: yes #this doesn't work due to bug
+    #enabled: yes #this doesn't work due to bug, see workaround in next task
 
-#must disable then enable (not use reenable) because this service hasn't been updated to systemd yet
+#Enable packet forwarder service
+#Service must be disabled then enabled. Simply enabling may not persist over reboot due to Ansible bug. 
+#This service is an older system V service that is wrapped to work with systemd. Therefore, the systemctl reenable command can't be used 
+#For these older system V services, two separate commands to first disable, then enable the service must be performed. 
 - name: disable packet forwarder start-at-boot
   become: yes
   shell: systemctl disable lora-packet-forwarder

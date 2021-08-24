@@ -25,17 +25,17 @@
     - { src: "{{ aws_url }}/chirpstack_config/chirpstack-network-server/chirpstack-network-server.toml", dest: "chirpstack-network-server", checksum: "{{ cns_config_md5 }}"}
     - { src: "{{ aws_url }}/chirpstack_config/chirpstack-gateway-bridge/chirpstack-gateway-bridge.toml", dest: "chirpstack-gateway-bridge", checksum: "{{ cgb_config_md5 }}"}
 
-- name: pull chirpstack gateway bridge
+- name: pull chirpstack gateway bridge image from ECR
   command: docker pull public.ecr.aws/n6v5k0e3/chirpstack-gateway-bridge:3.10.0-arm64v8 
   register: docker_result
   changed_when: docker_result.stdout is not search("Image is up to date")
 
-- name: pull chirpstack network server
+- name: pull chirpstack network server image from ECR
   command: docker pull public.ecr.aws/n6v5k0e3/chirpstack-network-server:3.12.3-arm64v8 
   register: docker_result
   changed_when: docker_result.stdout is not search("Image is up to date")
 
-- name: pull chirpstack application server
+- name: pull chirpstack application server image from ECR
   command: docker pull public.ecr.aws/n6v5k0e3/chirpstack-application-server:3.14.0-arm64v8
   register: docker_result
   changed_when: docker_result.stdout is not search("Image is up to date")

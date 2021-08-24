@@ -7,14 +7,17 @@
   systemd:
     name: docker
     state: restarted
-    #enabled: yes #this doesn't work due to bug
+    #enabled: yes #this doesn't work due to bug, see workaround in next task
 
-#Enable Docker
+#Enable Docker Workaround
+#Service must be disabled then enabled. Simply enabling may not persist over reboot due to Ansible bug. 
+#This command works for all modern systemd services. This will NOT work for old system V services that are wrapped. 
+#For those older services, you must do two separate commands to first disable, then enable. 
 - name: enable docker start-at-boot
   become: yes
   shell: systemctl reenable docker
 
-##Remove existing docker chirpstack containers and volumes. Remove chirpstack network
+##Remove docker assets from previous install (if any)
 - name: stop all docker chirpstack containers
   command: "docker stop {{ item }}"
   register: docker_result

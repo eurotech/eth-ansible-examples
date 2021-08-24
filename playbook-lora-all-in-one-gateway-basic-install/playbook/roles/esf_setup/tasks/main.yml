@@ -162,7 +162,7 @@
       register: esf_api_response
       retries: 15
       delay: 2
-      until: #list indicates implicit AND 
+      until: #list indicates implicit AND between all list items
         - (esf_api_response.json | to_json) is search("org.eclipse.kura.cloudconnection.raw.mqtt.provider")
         - (esf_api_response.json | to_json) is search("com.eurotech.framework.amq7")
       any_errors_fatal: true
@@ -172,7 +172,7 @@
       fail:
         msg: "FAILURE: Packages failed to install within 30 seconds. Check EFS configuration and log for errors."
 
-#snapshot contains config for Raw MQTT Cloud Connection and Artemis MQTT Broker
+#Apply snapshot containing config for Raw MQTT Cloud Connection and Artemis MQTT Broker
 - name: Apply Snapshot to ESF
   uri:
     url: "{{ esf_api_http_protocol }}://127.0.0.1/services/configuration/v1/snapshots/_upload"
@@ -184,7 +184,7 @@
     method: POST
     headers: 
       Content-Type: "application/xml" 
-    body: "{{lookup('url', aws_url+'/snapshots/LoRa_system_base_snapshot.xml', errors='strict', split_lines=False)}}" 
+    body: "{{lookup('url', aws_url+'/snapshots/LoRa_system_base_snapshot.xml', errors='strict', split_lines=False)}}" #stream xml file directly from AWS 
 
 ##Add Open Port 1883 for interface Chirpbridge to Firewall
 #Get Current Firewall Config
@@ -199,21 +199,15 @@
     method: GET
   register: firewall_config
 
-#Get Firewall Open Ports List
-- name: Parse Firewall Open Ports List
+#Parse Firewall Open Ports List and full firewall properties from URI response
+- name: Parse Firewall Open Ports List and Full Firewall Properties
   set_fact:
     firewall_open_ports: "{{ firewall_config.json.properties.get('firewall.open.ports') }}"
     firewall_properties: "{{ firewall_config.json.properties }}"
 
-# - name: Update Firewall Open Ports List (SKIP = port already opened)
-#   set_fact: 
-#     firewall_open_ports: "{{ firewall_open_ports }};1883,tcp,0.0.0.0/0,chirpbridge,,,,#"
-#   when: firewall_open_ports is not search("1883,tcp,0.0.0.0/0,chirpbridge,,,,#")
-#   register: firewall_ports_update
-
 - name: update firewall open ports list block
   block:
-    - name: Update Firewall Open Ports List (SKIP = port already opened)
+    - name: Add Port 1883 for interface Chirpbridge to Firewall Open Ports List (SKIP = port already opened)
       set_fact: 
         firewall_properties: "{{ firewall_properties | combine(new_item) }}"
       vars:

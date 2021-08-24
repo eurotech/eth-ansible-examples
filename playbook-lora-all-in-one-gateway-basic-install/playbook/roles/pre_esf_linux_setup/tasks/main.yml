@@ -32,7 +32,10 @@
 #   when: esf_major_version != "7"
 
 # Docker Configuration for Log Rotation
-- name: Download docker daemon config file (only if it doesn't exist already)
+# This will download the docker daemon.json file ONLY if it doesn't already exist
+# If daemon.json already exists, we assume it already handles logging because we don't want to overwrite it 
+# and cause problems for the existing docker setup
+- name: Download docker daemon config file (only if a docker daemon config file doesn't exist already)
   get_url: 
     url: "{{ aws_url }}/docker_config/daemon.json"
     dest: "/etc/docker/daemon.json"
@@ -48,6 +51,6 @@
     state: reloaded
   when: get_url_results.changed #skip if daemon.json wasn't changed in previous task
 
-#Create Docker network
+#Create chirpstack Docker bridge network
 - name: create docker network chirpbridge
   command: docker network create -d bridge --subnet 172.18.0.0/16 --gateway 172.18.0.1 --opt com.docker.network.bridge.name=chirpbridge chirpbridge

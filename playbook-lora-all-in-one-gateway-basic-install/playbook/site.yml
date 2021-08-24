@@ -1,4 +1,4 @@
-- name: Install TE Demo Kit
+- name: Install LoRa All-In-One Gateway Software
   hosts: localhost
   connection: local
 
@@ -17,8 +17,8 @@
     esf_username: "admin"
     
     #EFS version specific variables
-    #These variables are set to a default of EFS 6.2.0. 
-    #If EFS 7 is in use, they will be changed (in the validate_environment role)
+    #These variables are set to the default values for EFS 6.2.0. 
+    #If EFS 7 is in use, they will be changed in the validate_environment role
     esf_api_http_protocol: "http" #EFS 6.2.0: http; EFS 7: https
     esf_password: "admin" #EFS 6.2.0: "admin"; EFS 7: serial number
     
@@ -41,8 +41,6 @@
     docker_daemon_json_md5: "a6ba49cf41e8782fbe035a9a28e8fe69"
     lora_installer_version_md5: "2c23a95d70114569e0905d9676d3ffa6"
 
-  #pre_tasks:
-
   roles:
     - validate_environment
     - reset_environment
@@ -51,9 +49,3 @@
     - post_esf_linux_setup
     - chirpstack_install
     - chirpstack_configure
-
-  #post_tasks:
-       
-#    - name: Reboot gateway
-#      shell: /sbin/reboot
-#      when: reboot
