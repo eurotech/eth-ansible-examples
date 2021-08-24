@@ -81,11 +81,19 @@
 
 - name: Parse ESF Major Version Number
   set_fact:
-    esf_major_version: "{{ eth_vers_esf.stdout[4] }}"
+    #esf_major_version: "{{ eth_vers_esf.stdout[4] }}"
+    #this regex finds the pattern [number].[number].[number], with the target string being the first [number] (regex group 1)
+    #the regex_search returns a list with a single element containing our target string
+    #the [0] returns the string of our target value by getting the first (and only) element in the list
+    esf_major_version: "{{ (esf_version | regex_search('(\\d+)\\.\\d+\\.\\d+', '\\1'))[0] }}"
 
 - name: Display ESF Version info
   debug:
     msg: "Detected ESF Version: {{ esf_version }}. This is ESF {{ esf_major_version }}."
+
+- name: type debug
+  debug:
+    msg: "{{esf_major_version | type_debug}}"
 
 - name: Verify ESF Version is Valid
   fail: 
