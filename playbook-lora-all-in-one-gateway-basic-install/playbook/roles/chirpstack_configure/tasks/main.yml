@@ -151,123 +151,123 @@
         gatewayProfileID: ''
         serviceProfileID: "{{ serviceProfileID }}"
 
-#TESTING
-#to make it easier, this will use the API to create the device profile and device for
-#Abe's test 8911A
+TESTING
+to make it easier, this will use the API to create the device profile and device for
+Abe's test 8911A
 
-# - name: save test 8911A devEUI
-#   set_fact:
-#     devEUI_8911: "0022A70E00000144"
+- name: save test 8911A devEUI
+  set_fact:
+    devEUI_8911: "0022A70E00000144"
 
-# - name: save test 8911A appKEY
-#   set_fact:
-#     appKEY_8911: "499C025B5227D4FAF9FEA65FA87C0709"
+- name: save test 8911A appKEY
+  set_fact:
+    appKEY_8911: "499C025B5227D4FAF9FEA65FA87C0709"
 
-# - name: Create Device Profile for Test Device
-#   uri:
-#     url: http://localhost:8080/api/device-profiles
-#     method: POST
-#     body_format: json
-#     status_code: 200
-#     return_content: true
-#     headers:
-#       Content-Type: application/json
-#       Accept: application/json
-#       Authorization: "Bearer {{ jwtToken }}"
-#     body: 
-#       deviceProfile:
-#         name: "TE_8911A_Device"
-#         organizationID: "1"
-#         networkServerID: "1"
-#         supportsClassB: false
-#         classBTimeout: 0
-#         pingSlotPeriod: 0
-#         pingSlotDR: 0
-#         pingSlotFreq: 0
-#         supportsClassC: false
-#         classCTimeout: 0
-#         macVersion: "1.0.3"
-#         regParamsRevision: "A"
-#         rxDelay1: 0
-#         rxDROffset1: 0
-#         rxDataRate2: 0
-#         rxFreq2: 0
-#         factoryPresetFreqs: []
-#         maxEIRP: 0
-#         maxDutyCycle: 0
-#         supportsJoin: true
-#         rfRegion: "US915"
-#         supports32BitFCnt: false
-#         payloadCodec: ""
-#         payloadEncoderScript: ""
-#         payloadDecoderScript: ""
-#         geolocBufferTTL: 0
-#         geolocMinBufferSize: 0
-#         tags: {}
-#         uplinkInterval: "14400s"
-#         adrAlgorithmID: "default"
-#   register: response
+- name: Create Device Profile for Test Device
+  uri:
+    url: http://localhost:8080/api/device-profiles
+    method: POST
+    body_format: json
+    status_code: 200
+    return_content: true
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+      Authorization: "Bearer {{ jwtToken }}"
+    body: 
+      deviceProfile:
+        name: "TE_8911A_Device"
+        organizationID: "1"
+        networkServerID: "1"
+        supportsClassB: false
+        classBTimeout: 0
+        pingSlotPeriod: 0
+        pingSlotDR: 0
+        pingSlotFreq: 0
+        supportsClassC: false
+        classCTimeout: 0
+        macVersion: "1.0.3"
+        regParamsRevision: "A"
+        rxDelay1: 0
+        rxDROffset1: 0
+        rxDataRate2: 0
+        rxFreq2: 0
+        factoryPresetFreqs: []
+        maxEIRP: 0
+        maxDutyCycle: 0
+        supportsJoin: true
+        rfRegion: "US915"
+        supports32BitFCnt: false
+        payloadCodec: ""
+        payloadEncoderScript: ""
+        payloadDecoderScript: ""
+        geolocBufferTTL: 0
+        geolocMinBufferSize: 0
+        tags: {}
+        uplinkInterval: "14400s"
+        adrAlgorithmID: "default"
+  register: response
 
-# - name: show response
-#   debug:
-#     var: response
+- name: show response
+  debug:
+    var: response
 
-# - name: save device profile ID
-#   set_fact:
-#     deviceProfileID: "{{ response.json.id }}"
+- name: save device profile ID
+  set_fact:
+    deviceProfileID: "{{ response.json.id }}"
 
-# - name: show saved device profile ID
-#   debug:
-#     var: deviceProfileID
+- name: show saved device profile ID
+  debug:
+    var: deviceProfileID
 
-# - name: Create Test Device
-#   uri:
-#     url: http://localhost:8080/api/devices
-#     method: POST
-#     body_format: json
-#     status_code: 200
-#     return_content: true
-#     headers:
-#       Content-Type: application/json
-#       Accept: application/json
-#       Authorization: "Bearer {{ jwtToken }}"
-#     body: 
-#       device:
-#         devEUI: "{{ devEUI_8911 }}"
-#         name: "Demo_8911A_Device"
-#         applicationID: '1'
-#         description: "Demo 8911A Device"
-#         deviceProfileID: "{{ deviceProfileID }}"
-#         skipFCntCheck: false
-#         referenceAltitude: 0
-#         isDisabled: false
-#         register: response
+- name: Create Test Device
+  uri:
+    url: http://localhost:8080/api/devices
+    method: POST
+    body_format: json
+    status_code: 200
+    return_content: true
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+      Authorization: "Bearer {{ jwtToken }}"
+    body: 
+      device:
+        devEUI: "{{ devEUI_8911 }}"
+        name: "Demo_8911A_Device"
+        applicationID: '1'
+        description: "Demo 8911A Device"
+        deviceProfileID: "{{ deviceProfileID }}"
+        skipFCntCheck: false
+        referenceAltitude: 0
+        isDisabled: false
+        register: response
 
-# - name: show response
-#   debug:
-#     var: response
+- name: show response
+  debug:
+    var: response
 
-# - name: Create Keys for Test Device
-#   uri:
-#     url: "http://localhost:8080/api/devices/{{ devEUI_8911 }}/keys"
-#     method: POST
-#     body_format: json
-#     status_code: 200
-#     return_content: true
-#     headers:
-#       Content-Type: application/json
-#       Accept: application/json
-#       Authorization: "Bearer {{ jwtToken }}"
-#     body: 
-#       deviceKeys:
-#         appKey: '00000000000000000000000000000000' #this is hardcoded for OTAA devices
-#         devEUI: "{{ devEUI_8911 }}"
-#         genAppKey: ''
-#         nwkKey: "{{ appKEY_8911 }}"
+- name: Create Keys for Test Device
+  uri:
+    url: "http://localhost:8080/api/devices/{{ devEUI_8911 }}/keys"
+    method: POST
+    body_format: json
+    status_code: 200
+    return_content: true
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+      Authorization: "Bearer {{ jwtToken }}"
+    body: 
+      deviceKeys:
+        appKey: '00000000000000000000000000000000' #this is hardcoded for OTAA devices
+        devEUI: "{{ devEUI_8911 }}"
+        genAppKey: ''
+        nwkKey: "{{ appKEY_8911 }}"
 
-# - name: show response
-#   debug:
-#     var: response
+- name: show response
+  debug:
+    var: response
 
 # - name: Create TE Kit Chirpstack User
 #   uri:
