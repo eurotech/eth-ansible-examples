@@ -203,29 +203,40 @@
 - name: Parse Firewall Open Ports List
   set_fact:
     firewall_open_ports: "{{ firewall_config.json.properties.get('firewall.open.ports') }}"
+    firewall_properties: "{{ firewall_config.json.properties }}"
 
-- name: Update Firewall Open Ports List (SKIP = port already opened)
-  set_fact: 
-    firewall_open_ports: "{{ firewall_open_ports }};1883,tcp,0.0.0.0/0,chirpbridge,,,,#"
-  when: firewall_open_ports is not search("1883,tcp,0.0.0.0/0,chirpbridge,,,,#")
-  register: firewall_ports_update
+# - name: Update Firewall Open Ports List (SKIP = port already opened)
+#   set_fact: 
+#     firewall_open_ports: "{{ firewall_open_ports }};1883,tcp,0.0.0.0/0,chirpbridge,,,,#"
+#   when: firewall_open_ports is not search("1883,tcp,0.0.0.0/0,chirpbridge,,,,#")
+#   register: firewall_ports_update
 
-- name: Apply firewall update to gateway (SKIP = port already open)
-  uri:
-    url: "{{ esf_api_http_protocol }}://127.0.0.1/services/configuration/v1/configurableComponents/configurations/byPid/org.eclipse.kura.net.admin.FirewallConfigurationService/_update"
-    user: "{{esf_username}}"
-    password: "{{esf_password}}"
-    status_code: 200
-    force_basic_auth: yes
-    validate_certs: no
-    method: POST
-    body_format: json
-    body:
-      takeSnapshot: true
-      componentConfigurationRequest:
-        properties: 
-          firewall.open.ports: "{{ firewall_open_ports }}"
-  when: firewall_ports_update is not skipped
+- name: update firewall open ports list block
+  block:
+    - name: Update Firewall Open Ports List (SKIP = port already opened)
+      set_fact: 
+        firewall_properties: "{{ firewall_properties | combine(new_item) }}"
+      vars:
+        new_item: { 'firewall.open.ports': '{{ firewall_open_ports }};1883,tcp,0.0.0.0/0,chirpbridge,,,,#'}
+      with_dict: "{{ firewall_properties }}"
+
+    - name: Apply firewall update to gateway (SKIP = port already open)
+      uri:
+        url: "{{ esf_api_http_protocol }}://127.0.0.1/services/configuration/v1/configurableComponents/configurations/byPid/org.eclipse.kura.net.admin.FirewallConfigurationService/_update"
+        user: "{{esf_username}}"
+        password: "{{esf_password}}"
+        status_code: 200
+        force_basic_auth: yes
+        validate_certs: no
+        method: POST
+        body_format: json
+        body:
+          takeSnapshot: true
+          componentConfigurationRequest:
+            properties: 
+              "{{ firewall_properties }}"
+  when: firewall_open_ports is not search("1883,tcp,0.0.0.0/0,chirpbridge,,,,#") #block when
+
 
 #     #apply custom ESF settings
 # - name: copy custom ESF configuration files
