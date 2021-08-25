@@ -77,7 +77,8 @@
 
 - name: Prase Entire ESF Version
   set_fact:
-    esf_version: "{{ eth_vers_esf.stdout }}"
+    #this regex finds and returns the pattern [number].[number].[number]
+    esf_version: "{{ eth_vers_esf.stdout | regex_search('\\d+\\.\\d+\\.\\d+') }}"
 
 - name: Parse ESF Major Version Number
   set_fact:
@@ -101,7 +102,7 @@
           Contact Eurotech for instructions on installing the correct ESF version."
   when: #list implies logical AND between all 
     - esf_major_version != "7"
-    - esf_version != "ESF_6.2.0"
+    - esf_version != "6.2.0"
 
 ##Set variables based on ESF version
 #Default values are for ESF 6.2.0, so changes are only needed if using ESF 7
