@@ -15,21 +15,28 @@
 #     - { src: firewall/firewall_cust_aux, dest: /etc/init.d/, mode: "0755" }
 #   when: esf_major_version != "7"
 
+- name: ESF 6.2.0 Firewall Workaround Block
+  block:
+    - name: Ensure directories exists for firewall workaround (SKIP = ESF 7)
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "/opt/firewall-docker-workaround/"
+        - "/etc/init.d/"
 
-
-# MAKE SURE TO ENSURE FOLDERS EXIST BEFORE DOWNLOADING
-# #Firewall Workaround Setup (EFS 6.2.0 only)
-# - name: "EFS 6.2.0: Copy firewall workaround files (SKIP = EFS 7)"
-#   get_url: 
-#     url: "{{ item.src }}"
-#     dest: "{{ item.dest }}"
-#     mode: "{{ item.mode }}"
-#     checksum: "md5:{{ item.checksum }}"
-#   with_items:
-#     - { src: "{{ aws_url }}/firewall/addon-iptables", dest: /opt/firewall-docker-workaround/, mode: "0644", checksum: "{{ addon_iptables_md5 }}"}
-#     - { src: "{{ aws_url }}/firewall/firewall_cust", dest: /etc/init.d/, mode: "0755", checksum: "{{ firewall_cust_md5 }}" }
-#     - { src: "{{ aws_url }}/firewall/firewall_cust_aux", dest: /etc/init.d/, mode: "0755", checksum: "{{ firewall_cust_aux_md5 }}" }
-#   when: esf_major_version != "7"
+    #Firewall Workaround Setup (EFS 6.2.0 only)
+    - name: "EFS 6.2.0: Copy firewall workaround files (SKIP = EFS 7)"
+      get_url: 
+        url: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        mode: "{{ item.mode }}"
+        checksum: "md5:{{ item.checksum }}"
+      with_items:
+        - { src: "{{ aws_url }}/firewall/addon-iptables", dest: /opt/firewall-docker-workaround/, mode: "0644", checksum: "{{ addon_iptables_md5 }}"}
+        - { src: "{{ aws_url }}/firewall/firewall_cust", dest: /etc/init.d/, mode: "0755", checksum: "{{ firewall_cust_md5 }}" }
+        - { src: "{{ aws_url }}/firewall/firewall_cust_aux", dest: /etc/init.d/, mode: "0755", checksum: "{{ firewall_cust_aux_md5 }}" }
+  when: esf_major_version == "6" #block when
 
 # Docker Configuration for Log Rotation
 # This will download the docker daemon.json file ONLY if it doesn't already exist
