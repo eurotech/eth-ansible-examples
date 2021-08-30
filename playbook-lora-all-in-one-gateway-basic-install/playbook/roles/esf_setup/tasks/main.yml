@@ -60,52 +60,69 @@
 #     mode: "0644"
 #   register: copy_dps
 
-#     #modify dpa.properties (or create) if it doesn't exist
-# - name: add deployment packages to ESF
-#   lineinfile:
-#     path: /opt/eurotech/esf/packages/dpa.properties
-#     line: "{{ item.line }}"
-#     create: yes
-#     mode: "0644"
-#   with_items:
-#     - { line: 'com.eurotech.framework.amq7=file\:/opt/eurotech/esf/packages/com.eurotech.framework.amq7_1.1.0.dp' }
-#     - { line: 'org.eclipse.kura.cloudconnection.raw.mqtt.provider=file\:/opt/eurotech/esf/packages/org.eclipse.kura.cloudconnection.raw.mqtt.provider_1.0.0.dp' }
-#   register: modify_dpa
-
-# - name: Restart Kura if deployment package(s) were changed
+# - name: ESF 6.2.0 Install Ansible/API Package
 #   block:
-#   #Bounce Kura
-#   - name: Restart ESF
-#     systemd:
-#       name: kura
-#       state: restarted
+#     - name: Ensure directory exists for Ansible/API Package (SKIP = ESF 7)
+#       file:
+#         path: "/opt/eurotech/esf/data/packages/"
+#         state: directory
 
-#   #Get current time (log start time)
-#   - name: save current time
-#     command: 'date "+%Y-%m-%d %H:%M:%S"'
-#     register: logstarttime
+#     #Firewall Workaround Setup (EFS 6.2.0 only)
+#     - name: "EFS 6.2.0: Copy firewall workaround files (SKIP = EFS 7)"
+#       get_url: 
+#         url: "{{ item.src }}"
+#         dest: "{{ item.dest }}"
+#         mode: "{{ item.mode }}"
+#         checksum: "md5:{{ item.checksum }}"
+#       with_items:
+#         - { src: "{{ aws_url }}/firewall/addon-iptables", dest: /opt/firewall-docker-workaround/, mode: "0644", checksum: "{{ addon_iptables_md5 }}"}
+#         - { src: "{{ aws_url }}/firewall/firewall_cust", dest: /etc/init.d/, mode: "0755", checksum: "{{ firewall_cust_md5 }}" }
+#         - { src: "{{ aws_url }}/firewall/firewall_cust_aux", dest: /etc/init.d/, mode: "0755", checksum: "{{ firewall_cust_aux_md5 }}" }
 
-#   #Set fact for log start time
-#   - name: parse current time
-#     set_fact:
-#       log_start_time: "{{ logstarttime.stdout }}"
+#     #modify dpa.properties (or create if it doesn't exist)
+#     - name: add deployment packages to ESF
+#       lineinfile:
+#         path: /opt/eurotech/esf/data/dpa.properties
+#         line: "com.eurotech.framework.ansible.feature=file\:/opt/eurotech/esf/data/packages/com.eurotech.framework.ansible.feature_1.0.0.dp"
+#         create: yes
+#         mode: "0644"
+#       with_items:
+#       register: modify_dpa
 
-#   - name: kura restart confirmation
-#     block:
-#       - name: wait for ESF to start up (this can take up to 4 minutes)
-#         command: 'journalctl --since "{{log_start_time}}"'
-#         register: systemlogs
-#         retries: 24
-#         delay: 10
-#         until: systemlogs.stderr.find("Registering SelfConfiguringComponent - org.eclipse.kura.web.Console....Done") != -1 or systemlogs.stdout.find("Registering SelfConfiguringComponent - org.eclipse.kura.web.Console....Done") != -1
-#         any_errors_fatal: true
+#     - name: Restart Kura if deployment package(s) were changed
+#       block:
+#         #Bounce Kura
+#         - name: Restart ESF
+#           systemd:
+#             name: kura
+#             state: restarted
 
-#     rescue:
-#       - name: ESF failed to restart within 4 minutes
-#         fail:
-#           msg: "FAILURE: ESF failed to restart within 4 minutes. Check ESF log for errors."
-  
-#   when: copy_dps.changed or modify_dpa.changed #block when
+#         #Get current time (log start time)
+#         - name: save current time
+#           command: 'date "+%Y-%m-%d %H:%M:%S"'
+#           register: logstarttime
+
+#         #Set fact for log start time
+#         - name: parse current time
+#           set_fact:
+#             log_start_time: "{{ logstarttime.stdout }}"
+
+#         - name: kura restart confirmation
+#           block:
+#             - name: wait for ESF to start up (this can take up to 4 minutes)
+#               command: 'journalctl --since "{{log_start_time}}"'
+#               register: systemlogs
+#               retries: 24
+#               delay: 10
+#               until: systemlogs.stderr.find("Registering SelfConfiguringComponent - org.eclipse.kura.web.Console....Done") != -1 or systemlogs.stdout.find("Registering SelfConfiguringComponent - org.eclipse.kura.web.Console....Done") != -1
+#               any_errors_fatal: true
+
+#           rescue:
+#             - name: ESF failed to restart within 4 minutes
+#               fail:
+#                 msg: "FAILURE: ESF failed to restart within 4 minutes. Check ESF log for errors."
+#       when: download_dps.changed or modify_dpa.changed #restart kura block when
+#   when: esf_major_version == "6" #install Ansible/API block when
 
 - name: Install Raw MQTT Package
   uri:

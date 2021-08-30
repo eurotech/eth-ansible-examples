@@ -4,6 +4,10 @@ ToDo:
 * Document passing in custom ESF credentials
 * document that docker logging is NOT enabled if daemon.json already exists!
 * document lora installer file version
+* document that for 6.2.0, ansible package must be installed and configured with user assets;deploy;configuration
+
+* finish validate test for REST
+* adjust REST fail messages to point to troubleshooting section of documentation
 
 MQTT Broker Credentials
 UN: LoRaMQTTUser

@@ -40,12 +40,13 @@
     cgb_config_md5: "d436ceb9fcf745e4a7e70bc76b3d6f9c"
     docker_daemon_json_md5: "a6ba49cf41e8782fbe035a9a28e8fe69"
     lora_installer_version_md5: "2c23a95d70114569e0905d9676d3ffa6"
+    ansible_package_md5: "80c8df23f6ce93181dd36ccd0c5db899"
 
   roles:
     - validate_environment
     - reset_environment
     - pre_esf_linux_setup
     - esf_setup
-    - post_esf_linux_setup
-    - chirpstack_install
-    - chirpstack_configure
+    #- post_esf_linux_setup
+    #- chirpstack_install
+    #- chirpstack_configure
