@@ -1,15 +1,15 @@
-- name: Xylem Update GPG Key
+- name: Update GPG Key
   hosts: localhost
   connection: local
 
   tasks:
-    - name: Copy Xylem gpgpub key
+    - name: Copy gpgpub key
       copy:
         src: 'gpgpub.key'
         dest: '/tmp'
         mode: '0644'
 
-    - name: Install the Xylem GPG public key
+    - name: Install the GPG public key
       command: rpm --import /tmp/gpgpub.key
       args:
         warn: false
