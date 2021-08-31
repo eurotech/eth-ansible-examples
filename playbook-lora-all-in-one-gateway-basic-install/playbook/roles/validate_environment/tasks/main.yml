@@ -138,9 +138,9 @@
 ##For ESF 6.2.0 Only, check to make sure Ansible package is installed and correctly configured
 - name: Verify Ansible/REST Package is installed and configured correctly
   block:
-    - name: Check for Configuration Access (SKIP = ESF 7)
+    - name: Check for REST Configuration API Access (SKIP = ESF 7)
       uri: #attempt to get list of PIDs for configurable components to test configuration access
-        url: "{{ esf_api_http_protocol }}://127.0.0.1/configuration/v1/configurableComponents"
+        url: "{{ esf_api_http_protocol }}://127.0.0.1/services/configuration/v1/configurableComponents"
         user: "{{esf_username}}"
         password: "{{esf_password}}"
         status_code: 200
@@ -151,8 +151,8 @@
 
       register: rest_config_results
 
-    - name: Check for Deploy Access (SKIP = ESF 7)
-      uri: #atttempt to get list of installed packages to test deploy access
+    - name: Check for REST Deploy API Access (SKIP = ESF 7)
+      uri: #attempt to get list of installed packages to test deploy access
         url: "{{ esf_api_http_protocol }}://127.0.0.1/services/deploy/v1/"
         user: "{{esf_username}}"
         password: "{{esf_password}}"
@@ -163,44 +163,45 @@
         return_content: yes
       register: rest_deploy_results
 
-  #IF 1 fails with 404 ELSE
-  #IF 1 fails with 403 ELSE
-  #IF 1 fails with not 404 and not 403
-  #IF 2 fails with 404 ELSE (highly unlikely)
-  #IF 2 Fails with 403 ELSE
-  #IF 2 fails with not 404 and not 403
-
-
   rescue: 
-    - name: REST Access Check 1 of 4 (SKIP = Pass)
+      ##Check for configuration API errors first
+    - name: REST Access Check 1 of 6 (SKIP = Pass)
       fail:
-        msg: "Unable to access REST APIs. Received 404 not found error. This is usually because the Ansible package hasn't been installed. Install the Ansible package and configure it according to the users guide, then try again or contact Eurotech for further assistance. " 
-      when: #list implies AND between each list item 
-        - rest_config_results.status == 404 
-        - rest_deploy_results.status == 404
+        msg: "Unable to access REST APIs. Received 404 not found error for configuration API access attempt. This is usually because the Ansible package hasn't been installed. Install the Ansible package and configure it according to the users guide, then try again or contact Eurotech for further assistance. " 
+      when: rest_config_results.status == 404 
 
-    - name: REST Access Check 2 of 4 (SKIP = Pass)
+    - name: REST Access Check 2 of 6 (SKIP = Pass)
       fail:
-        msg: "Unable to access REST APIs. Received 403 unauthorized error for configuration. Add the configuration role to the Ansible package user in ESF then try again or contact Eurotech for further assistance. " 
-      when: #list implies AND between each list item 
-        - rest_config_results.status == 403
-        - rest_deploy_results.status == 200
+        msg: "Unable to access REST APIs. Received 403 unauthorized error for configuration API access attempt. Ensure the RestService username/password are correct, and that the user has the asset, configuration, and deploy roles assigned to it (this can be accessed via ESF). Then try again or contact Eurotech for further assistance. " 
+      when: rest_config_results.status == 403
 
-    - name: REST Access Check 3 of 4 (SKIP = Pass)
+    - name: REST Access Check 3 of 6 (SKIP = Pass)
       fail:
-        msg: "Unable to access REST APIs. Received 403 unauthorized error for deploy. Add the deploy role to the Ansible package user in ESF then try again or contact Eurotech for further assistance. " 
+        msg: "Unable to access REST APIs. Received unexpected error for configuration API access attempt: Error {{rest_config_results.status}}. Try again or contact Eurotech support for assistance."
       when: #list implies AND between each list item 
-        - rest_config_results.status == 200
-        - rest_deploy_results.status == 403
-
-    - name: REST Access Check 4 of 4 (SKIP = Pass)
+        - rest_config_results.status != 200
+        - rest_config_results.status != 404
+        - rest_config_results.status != 403
+      
+      ##Check for deploy API errors second
+    - name: REST Access Check 4 of 6 (SKIP = Pass)
       fail:
-        msg: "Unable to access REST APIs. Received 403 unauthorized error for deploy and configuration. This could be because the Ansible username and password has not been set up correctly, or is missing both deploy and configuration roles. Correct the issue in ESF then try again or contact Eurotech for further assistance. " 
-      when: #list implies AND between each list item 
-        - rest_config_results.status == 403
-        - rest_deploy_results.status == 403
+        msg: "Unable to access REST APIs. Received 404 not found error for deploy API access attempt. This is usually because the Ansible package hasn't been installed. Install the Ansible package and configure it according to the users guide, then try again or contact Eurotech for further assistance. " 
+      when: rest_deploy_results.status == 404 
 
-    - name: REST Access Check 4 of 4 (SKIP = Pass)
+    - name: REST Access Check 5 of 6 (SKIP = Pass)
+      fail:
+        msg: "Unable to access REST APIs. Received 403 unauthorized error for deploy API access attempt. Ensure the RestService username/password are correct, and that the user has the asset, configuration, and deploy roles assigned to it (this can be accessed via ESF). Then try again or contact Eurotech for further assistance. " 
+      when: rest_deploy_results.status == 403
+
+    - name: REST Access Check 6 of 6 (SKIP = Pass)
+      fail:
+        msg: "Unable to access REST APIs. Received unexpected error for deploy API access attempt: Error {{rest_config_results.status}}. Try again or contact Eurotech support for assistance."
+      when: #list implies AND between each list item 
+        - rest_deploy_results.status != 200
+        - rest_deploy_results.status != 404
+        - rest_deploy_results.status != 403
+
   when: esf_major_version == "6" #block when
 
 # Create the version file
