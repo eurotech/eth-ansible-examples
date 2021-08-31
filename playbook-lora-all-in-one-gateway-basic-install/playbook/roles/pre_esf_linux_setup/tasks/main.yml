@@ -26,7 +26,7 @@
         - "/etc/init.d/"
 
     #Firewall Workaround Setup (EFS 6.2.0 only)
-    - name: "EFS 6.2.0: Copy firewall workaround files (SKIP = EFS 7)"
+    - name: Copy firewall workaround files (SKIP = EFS 7)
       get_url: 
         url: "{{ item.src }}"
         dest: "{{ item.dest }}"
