@@ -6,7 +6,7 @@ ToDo:
 * document lora installer file version
 * document that for 6.2.0, ansible package must be installed and configured with user assets;deploy;configuration
 
-* finish validate test for REST
+* Add Error 503 (API not ready yet) error handling for invoking script too soon after Kura startup
 * adjust REST fail messages to point to troubleshooting section of documentation
 
 MQTT Broker Credentials

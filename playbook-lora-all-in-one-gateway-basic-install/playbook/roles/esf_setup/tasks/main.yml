@@ -216,6 +216,7 @@
     method: GET
   register: firewall_config
 
+
 #Parse Firewall Open Ports List and full firewall properties from URI response
 - name: Parse Firewall Open Ports List and Full Firewall Properties
   set_fact:
@@ -281,45 +282,32 @@
       debug:
         var: network_properties
 
-    # - name: Set chirpbridge to Not Managed (SKIP = ESF 7)
-    #   set_fact: 
-    #     network_properties: "{{ network_properties | combine(new_item) }}"
-    #   vars:
-    #     new_item: { 'net.interface.chirpbridge.config.ip4.status': 'netIPv4StatusUnmanaged'}
-    #   with_dict: "{{ network_properties }}"
+    - name: Set chirpbridge to Not Managed (SKIP = ESF 7)
+      set_fact: 
+        network_properties: "{{ network_properties | combine(new_item) | rejectattr('key', 'search', 'password') | rejectattr('key', 'search', 'passphrase') }}"
+      vars:
+        new_item: { 'net.interface.chirpbridge.config.ip4.status': 'netIPv4StatusUnmanaged'}
+      with_dict: "{{ network_properties }}"
 
     - name: debug print network_properties after changing
       debug:
         var: network_properties
 
-    # - name: set test filters
-    #   set_fact:
-    #     test_json: "{{network_properties | to_json}}"
-    #     test_yaml: "{{network_properties | to_yaml}}"
-
-    # - name: debug print network_properties json
-    #   debug:
-    #     var: test_json
-
-    # - name: debug print network_properties yaml
-    #   debug:
-    #     var: test_yaml
-
-    - name: Apply network configuration update to ESF (SKIP = ESF 7)
-      uri:
-        url: "{{ esf_api_http_protocol }}://127.0.0.1/services/configuration/v1/configurableComponents/configurations/byPid/org.eclipse.kura.net.admin.NetworkConfigurationService/_update"
-        user: "{{esf_username}}"
-        password: "{{esf_password}}"
-        status_code: 200
-        force_basic_auth: yes
-        validate_certs: no
-        method: POST
-        body_format: json
-        body:
-          takeSnapshot: true
-          componentConfigurationRequest:
-            properties: 
-              "{{ network_properties }}"
+    # - name: Apply network configuration update to ESF (SKIP = ESF 7)
+    #   uri:
+    #     url: "{{ esf_api_http_protocol }}://127.0.0.1/services/configuration/v1/configurableComponents/configurations/byPid/org.eclipse.kura.net.admin.NetworkConfigurationService/_update"
+    #     user: "{{esf_username}}"
+    #     password: "{{esf_password}}"
+    #     status_code: 200
+    #     force_basic_auth: yes
+    #     validate_certs: no
+    #     method: POST
+    #     body_format: json
+    #     body:
+    #       takeSnapshot: true
+    #       componentConfigurationRequest:
+    #         properties: 
+    #           "{{ network_properties }}"
   when: esf_major_version == "6" #block when
 
 
