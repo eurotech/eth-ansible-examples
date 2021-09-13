@@ -44,8 +44,8 @@
 
   roles:
     - validate_environment
-    - reset_environment
-    - pre_esf_linux_setup
+    #- reset_environment
+    #- pre_esf_linux_setup
     - esf_setup
     #- post_esf_linux_setup
     #- chirpstack_install

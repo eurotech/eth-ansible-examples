@@ -284,7 +284,7 @@
 
     - name: Set chirpbridge to Not Managed (SKIP = ESF 7)
       set_fact: 
-        network_properties: "{{ network_properties | combine(new_item) | rejectattr('key', 'search', 'password') | rejectattr('key', 'search', 'passphrase') }}"
+        network_properties: "{{ network_properties | combine(new_item) | dict2items | selectattr('key', 'search', 'chirpbridge') | rejectattr('key', 'search', 'password') | rejectattr('key', 'search', 'passphrase') | list | items2dict }}"
       vars:
         new_item: { 'net.interface.chirpbridge.config.ip4.status': 'netIPv4StatusUnmanaged'}
       with_dict: "{{ network_properties }}"
