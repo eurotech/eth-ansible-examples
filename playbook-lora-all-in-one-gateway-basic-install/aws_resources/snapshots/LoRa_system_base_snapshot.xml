@@ -8,7 +8,7 @@
                 <esf:value>0</esf:value>
             </esf:property>
             <esf:property array="false" encrypted="false" name="enable.rate.limit" type="Boolean">
-                <esf:value>true</esf:value>
+                <esf:value>false</esf:value>
             </esf:property>
             <esf:property array="false" encrypted="false" name="in-flight-messages.max-number" type="Integer">
                 <esf:value>9</esf:value>
