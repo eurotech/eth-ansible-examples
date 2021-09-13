@@ -86,7 +86,7 @@
         reportDevStatusBattery: false
         reportDevStatusMargin: false
         drMin: 0
-        drMax: 5
+        drMax: 4
         channelMask: null
         prAllowed: false
         hrAllowed: false
