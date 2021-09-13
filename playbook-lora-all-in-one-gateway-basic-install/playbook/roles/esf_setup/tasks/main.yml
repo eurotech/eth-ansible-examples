@@ -304,21 +304,55 @@
     #   debug:
     #     var: network_properties
 
-    # - name: Apply network configuration update to ESF (SKIP = ESF 7)
-    #   uri:
-    #     url: "{{ esf_api_http_protocol }}://127.0.0.1/services/configuration/v1/configurableComponents/configurations/byPid/org.eclipse.kura.net.admin.NetworkConfigurationService/_update"
-    #     user: "{{esf_username}}"
-    #     password: "{{esf_password}}"
-    #     status_code: 200
-    #     force_basic_auth: yes
-    #     validate_certs: no
-    #     method: POST
-    #     body_format: json
-    #     body:
-    #       takeSnapshot: true
-    #       componentConfigurationRequest:
-    #         properties: 
-    #           "{{ network_properties }}"
+    - name: Apply network configuration update to ESF (SKIP = ESF 7)
+      uri:
+        url: "{{ esf_api_http_protocol }}://127.0.0.1/services/configuration/v1/configurableComponents/configurations/byPid/org.eclipse.kura.net.admin.NetworkConfigurationService/_update"
+        user: "{{esf_username}}"
+        password: "{{esf_password}}"
+        status_code: 200
+        force_basic_auth: yes
+        validate_certs: no
+        method: POST
+        body_format: json
+        body:
+          takeSnapshot: true
+          componentConfigurationRequest:
+            properties: 
+              "{{ network_properties }}"
+      
+    #Bounce Kura
+    - name: Bounce Kura Block (ESF 6, log file) 
+      block:
+        - name: "Restart ESF: Setup variables (SKIP = ESF 7)"
+          set_fact:
+            tmp_tail_log_file: /tmp/tail_file.out
+            timeout_value: 400 # async should terminate the task, but linux timeout command is used below as well for backup
+            log_file: /var/log/kura.log
+            
+        - name: "Restart ESF: Setup and start temporary shadow log (SKIP = ESF 7)"
+          shell: timeout {{ timeout_value }} tail -n 0 -f {{ log_file }} > {{ tmp_tail_log_file }}
+          async: "{{ timeout_value }}"
+          poll: 0
+          
+        - name: "Restart ESF: Restart ESF (SKIP = ESF 7)"
+          systemd:
+            name: kura
+            state: restarted
+
+        - name: "Restart ESF: Wait for ESF to finish restarting (SKIP = ESF 7)"
+          wait_for:
+            timeout: "{{ timeout_value }}"
+            path: "{{ tmp_tail_log_file }}"
+            search_regex: "{{ pattern_search }}"
+          vars:
+            pattern_search: "(org\\.eclipse\\.kura\\.web\\.Console\\.\\.\\.\\.Done)"
+
+      rescue:
+        - name: ESF failed to restart within 6 minutes
+          fail:
+            msg: "FAILURE: ESF failed to restart within 6 minutes. Check ESF log for errors."
+
+    #ESF must be restarted after setting network properties due to a bug
   when: esf_major_version == "6" #block when
 
 
