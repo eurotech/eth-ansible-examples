@@ -1,0 +1,154 @@
+# See https://www.chirpstack.io/network-server/install/config/ for a full
+# configuration example and documentation.
+#
+# This file is for the US915 band (channels 0-7). See the examples/ folder for more
+# configuration examples.
+
+[postgresql]
+dsn="postgres://chirpstack_ns:CNSpwLoRa@postgres-chirpstack:5432/chirpstack_ns?sslmode=disable"
+
+[redis]
+url="redis://redis-chirpstack:6379"
+
+[network_server]
+net_id="000000"
+
+[network_server.band]
+name="US915"
+
+  [network_server.network_settings]
+  enabled_uplink_channels=[8, 9, 10, 11, 12, 13, 14, 15, 65]
+  #enable all possible channels
+  #enabled_uplink_channels=[]
+
+  # Network-server API
+  #
+  # This is the network-server API that is used by ChirpStack Application Server or other
+  # custom components interacting with ChirpStack Network Server.
+  [network_server.api]
+  # ip:port to bind the api server
+  bind="0.0.0.0:8004"
+
+  # ca certificate used by the api server (optional)
+  ca_cert=""
+
+  # tls certificate used by the api server (optional)
+  tls_cert=""
+
+  # tls key used by the api server (optional)
+  tls_key=""
+
+# Backend defines the gateway backend settings.
+  #
+  # The gateway backend handles the communication with the gateway(s) part of
+  # the LoRaWAN network.
+  [network_server.gateway.backend]
+    # Backend
+    #
+    # This defines the backend to use for the communication with the gateways.
+    # Use the section name of one of the following gateway backends.
+    # Valid options are:
+    #  * mqtt
+    #  * amqp
+    #  * gcp_pub_sub
+    #  * azure_iot_hub
+    type="mqtt"
+
+    # Multi-downlink feature flag.
+    #
+    # This controls the new multi downlink feature, in which the Chirpstack
+    # Network Server will send the downlink parameters for all possible
+    # receive windows to the ChirpStack Gateway Bridge, avoiding an additional
+    # roundtrip in case of a retry (e.g second receive window).
+    #
+    # Valid options are:
+    #  * hybrid     (default)
+    #  * multi_only (will become the default in next major release)
+    #  * legacy
+    #
+    # hybrid: Will send a downlink command in both the new (multi) format
+    # as the old format to the ChirpStack Gateway Bridge. Use this when
+    # not all ChirpStack Gateway Bridge instances are v3.9+.
+    #
+    # multi_only: Will send a downlink command only in the new (multi) format.
+    # This will not work with ChirpStack Gateway Bridge versions less than v3.9.
+    #
+    # legacy: Will send a downlink command only in the old format.
+    multi_downlink_feature="multi_only"
+
+
+    # MQTT gateway backend settings.
+    #
+    # This is the backend communicating with the LoRa gateways over a MQTT broker.
+    [network_server.gateway.backend.mqtt]
+    # MQTT topic templates for the different MQTT topics.
+    #
+    # The meaning of these topics are documented at:
+    # https://www.chirpstack.io/gateway-bridge/
+    #
+    # The default values match the default expected configuration of the
+    # ChirpStack Gateway Bridge MQTT backend. Therefore only change these values when
+    # absolutely needed.
+
+    # Event topic template.
+    event_topic="gateway/+/event/+"
+
+    # Command topic template.
+    #
+    # Use:
+    #   * "{{ .GatewayID }}" as an substitution for the LoRa gateway ID
+    #   * "{{ .CommandType }}" as an substitution for the command type
+    command_topic_template="gateway/{{ .GatewayID }}/command/{{ .CommandType }}"
+
+    # MQTT server (e.g. scheme://host:port where scheme is tcp, ssl or ws)
+    server="tcp://mqttserver:1883"
+
+    # Connect with the given username (optional)
+    username="LoRaMQTTUser"
+
+    # Connect with the given password (optional)
+    password="LoRaMQTTpw"
+
+    # Maximum interval that will be waited between reconnection attempts when connection is lost.
+    # Valid units are 'ms', 's', 'm', 'h'. Note that these values can be combined, e.g. '24h30m15s'.
+    max_reconnect_interval="1m0s"
+
+    # Quality of service level
+    #
+    # 0: at most once
+    # 1: at least once
+    # 2: exactly once
+    #
+    # Note: an increase of this value will decrease the performance.
+    # For more information: https://www.hivemq.com/blog/mqtt-essentials-part-6-mqtt-quality-of-service-levels
+    qos=0
+
+    # Clean session
+    #
+    # Set the "clean session" flag in the connect message when this client
+    # connects to an MQTT broker. By setting this flag you are indicating
+    # that no messages saved by the broker for this client should be delivered.
+    clean_session=true
+
+    # Client ID
+    #
+    # Set the client id to be used by this client when connecting to the MQTT
+    # broker. A client id must be no longer than 23 characters. When left blank,
+    # a random id will be generated. This requires clean_session=true.
+    client_id=""
+
+    # CA certificate file (optional)
+    #
+    # Use this when setting up a secure connection (when server uses ssl://...)
+    # but the certificate used by the server is not trusted by any CA certificate
+    # on the server (e.g. when self generated).
+    ca_cert=""
+
+    # TLS certificate file (optional)
+    tls_cert=""
+
+    # TLS key file (optional)
+    tls_key=""
+
+[join_server.default]
+server="http://chirpstack-application-server:8003"

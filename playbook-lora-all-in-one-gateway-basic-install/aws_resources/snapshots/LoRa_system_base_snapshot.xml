@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="UTF-8"?><esf:configurations xmlns:esf="http://eurotech.com/esf/2.0" xmlns:ocd="http://www.osgi.org/xmlns/metatype/v1.2.0">
+    <esf:configuration pid="org.eclipse.kura.cloudconnection.raw.mqtt.DataService-LoRa">
+        <esf:properties>
+            <esf:property array="false" encrypted="false" name="store.purge-age" type="Integer">
+                <esf:value>60</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="in-flight-messages.congestion-timeout" type="Integer">
+                <esf:value>0</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="enable.rate.limit" type="Boolean">
+                <esf:value>true</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="in-flight-messages.max-number" type="Integer">
+                <esf:value>9</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="service.factoryPid" type="String">
+                <esf:value>org.eclipse.kura.data.DataService</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="connection.recovery.max.failures" type="Integer">
+                <esf:value>10</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="disconnect.quiesce-timeout" type="Integer">
+                <esf:value>10</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="kura.service.pid" type="String">
+                <esf:value>org.eclipse.kura.cloudconnection.raw.mqtt.DataService-LoRa</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="store.housekeeper-interval" type="Integer">
+                <esf:value>900</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="connect.auto-on-startup" type="Boolean">
+                <esf:value>true</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="rate.limit.time.unit" type="String">
+                <esf:value>SECONDS</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="rate.limit.average" type="Integer">
+                <esf:value>1</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="store.db.service.pid" type="String">
+                <esf:value>org.eclipse.kura.db.H2DbService</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="DataTransportService.target" type="String">
+                <esf:value>(kura.service.pid=org.eclipse.kura.cloudconnection.raw.mqtt.MqttDataTransport-LoRa)</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="connect.retry-interval" type="Integer">
+                <esf:value>60</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="enable.recovery.on.connection.failure" type="Boolean">
+                <esf:value>false</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="rate.limit.burst.size" type="Integer">
+                <esf:value>1</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="in-flight-messages.republish-on-new-session" type="Boolean">
+                <esf:value>true</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="store.capacity" type="Integer">
+                <esf:value>10000</esf:value>
+            </esf:property>
+        </esf:properties>
+    </esf:configuration>
+    <esf:configuration pid="org.eclipse.kura.cloudconnection.raw.mqtt.CloudEndpoint-LoRa">
+        <esf:properties>
+            <esf:property array="false" encrypted="false" name="kura.cloud.connection.factory.pid" type="String">
+                <esf:value>org.eclipse.kura.cloudconnection.raw.mqtt.factory.RawMqttCloudConnectionFactory</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="DataService.target" type="String">
+                <esf:value>(kura.service.pid=org.eclipse.kura.cloudconnection.raw.mqtt.DataService-LoRa)</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="service.factoryPid" type="String">
+                <esf:value>org.eclipse.kura.cloudconnection.raw.mqtt.cloud.RawMqttCloudEndpoint</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="kura.service.pid" type="String">
+                <esf:value>org.eclipse.kura.cloudconnection.raw.mqtt.CloudEndpoint-LoRa</esf:value>
+            </esf:property>
+        </esf:properties>
+    </esf:configuration>
+    <esf:configuration pid="LoRaMQTT.subscriber">
+        <esf:properties>
+            <esf:property array="false" encrypted="false" name="topic.filter" type="String">
+                <esf:value>application/1/device/+/event/up</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="qos" type="Integer">
+                <esf:value>0</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="service.factoryPid" type="String">
+                <esf:value>org.eclipse.kura.cloudconnection.raw.mqtt.subscriber.RawMqttSubscriber</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="cloud.endpoint.service.pid" type="String">
+                <esf:value>org.eclipse.kura.cloudconnection.raw.mqtt.CloudEndpoint-LoRa</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="kura.service.pid" type="String">
+                <esf:value>LoRaMQTT.subscriber</esf:value>
+            </esf:property>
+        </esf:properties>
+    </esf:configuration>
+    <esf:configuration pid="org.eclipse.kura.cloudconnection.raw.mqtt.MqttDataTransport-LoRa">
+        <esf:properties>
+            <esf:property array="false" encrypted="false" name="in-flight.persistence" type="String">
+                <esf:value>memory</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="SslManagerService.target" type="String">
+                <esf:value>(kura.service.pid=org.eclipse.kura.ssl.SslManagerService)</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="clean-session" type="Boolean">
+                <esf:value>true</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="lwt.retain" type="Boolean">
+                <esf:value>false</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="protocol-version" type="Integer">
+                <esf:value>4</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="service.factoryPid" type="String">
+                <esf:value>org.eclipse.kura.core.data.transport.mqtt.MqttDataTransport</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="timeout" type="Integer">
+                <esf:value>10</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="kura.service.pid" type="String">
+                <esf:value>org.eclipse.kura.cloudconnection.raw.mqtt.MqttDataTransport-LoRa</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="broker-url" type="String">
+                <esf:value>mqtt://localhost:1883/</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="true" name="password" type="Password">
+                <esf:value>TG9SYU1RVFRwdw==</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="keep-alive" type="Integer">
+                <esf:value>30</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="topic.context.account-name" type="String">
+                <esf:value>account-name</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="lwt.topic" type="String">
+                <esf:value>$EDC/#account-name/#client-id/MQTT/LWT</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="lwt.payload" type="String">
+                <esf:value/>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="lwt.qos" type="Integer">
+                <esf:value>0</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="client-id" type="String">
+                <esf:value/>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="username" type="String">
+                <esf:value>LoRaMQTTUser</esf:value>
+            </esf:property>
+        </esf:properties>
+    </esf:configuration>
+    <esf:configuration pid="org.eclipse.kura.broker.artemis.xml.BrokerInstance">
+        <esf:properties>
+            <esf:property array="false" encrypted="false" name="requiredProtocols" type="String">
+                <esf:value>MQTT</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="brokerXml" type="String">
+                <esf:value>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+
+&lt;configuration xmlns="urn:activemq"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="
+urn:activemq https://raw.githubusercontent.com/apache/activemq-artemis/master/artemis-server/src/main/resources/schema/artemis-server.xsd
+urn:activemq:core https://raw.githubusercontent.com/apache/activemq-artemis/master/artemis-server/src/main/resources/schema/artemis-configuration.xsd
+"&gt;
+
+    &lt;core xmlns="urn:activemq:core"&gt;
+        &lt;persistence-enabled&gt;false&lt;/persistence-enabled&gt;
+
+        &lt;acceptors&gt;
+            &lt;acceptor name="mqtt-acceptor"&gt;tcp://0.0.0.0:1883?protocols=MQTT&lt;/acceptor&gt;
+        &lt;/acceptors&gt;
+
+        &lt;resolve-protocols&gt;false&lt;/resolve-protocols&gt;
+
+        &lt;security-settings&gt;
+        &lt;!-- WARNING: this is only for testing and completely insecure --&gt;
+            &lt;security-setting match="#"&gt;
+                &lt;permission type="createDurableQueue" roles="guest"/&gt;
+                &lt;permission type="deleteDurableQueue" roles="guest"/&gt;
+                &lt;permission type="createNonDurableQueue" roles="guest"/&gt;
+                &lt;permission type="deleteNonDurableQueue" roles="guest"/&gt;
+                &lt;permission type="consume" roles="guest"/&gt;
+                &lt;permission type="send" roles="guest"/&gt;
+                &lt;permission type="createAddress" roles="guest"/&gt;
+                &lt;permission type="deleteAddress" roles="guest"/&gt;
+                &lt;permission type="browse" roles="guest"/&gt;
+            &lt;/security-setting&gt;
+        &lt;/security-settings&gt;
+
+    &lt;/core&gt;
+
+&lt;/configuration&gt;</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="defaultUser" type="String">
+                <esf:value>LoRaMQTTUser</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="enabled" type="Boolean">
+                <esf:value>true</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="users" type="String">
+                <esf:value>LoRaMQTTUser=LoRaMQTTpw|guest</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="kura.service.pid" type="String">
+                <esf:value>org.eclipse.kura.broker.artemis.xml.BrokerInstance</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="service.pid" type="String">
+                <esf:value>org.eclipse.kura.broker.artemis.xml.BrokerInstance</esf:value>
+            </esf:property>
+        </esf:properties>
+    </esf:configuration>
+    <esf:configuration pid="Chirpstack">
+        <esf:properties>
+            <esf:property array="false" encrypted="false" name="factoryPid" type="String">
+                <esf:value>org.eclipse.kura.wire.CloudSubscriber</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="CloudSubscriber.target" type="String">
+                <esf:value>(kura.service.pid=LoRaMQTT.subscriber)</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="componentId" type="String">
+                <esf:value>Chirpstack</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="factoryComponent" type="Boolean">
+                <esf:value>false</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="componentDescription" type="String">
+                <esf:value>A wire component which subscribes data from the cloud platform</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="service.factoryPid" type="String">
+                <esf:value>org.eclipse.kura.wire.CloudSubscriber</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="kura.service.pid" type="String">
+                <esf:value>Chirpstack</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="service.pid" type="String">
+                <esf:value>org.eclipse.kura.wire.CloudSubscriber-1628881754064-4</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="emitter.port.count" type="Integer">
+                <esf:value>1</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="body.property.type" type="String">
+                <esf:value>BYTE_ARRAY</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="set.property.from.body" type="String">
+                <esf:value/>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="receiver.port.count" type="Integer">
+                <esf:value>0</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="componentName" type="String">
+                <esf:value>Subscriber</esf:value>
+            </esf:property>
+        </esf:properties>
+    </esf:configuration>
+    <esf:configuration pid="logger">
+        <esf:properties>
+            <esf:property array="false" encrypted="false" name="emitter.port.count" type="Integer">
+                <esf:value>0</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="factoryPid" type="String">
+                <esf:value>org.eclipse.kura.wire.Logger</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="componentId" type="String">
+                <esf:value>logger</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="receiver.port.count" type="Integer">
+                <esf:value>1</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="factoryComponent" type="Boolean">
+                <esf:value>false</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="componentDescription" type="String">
+                <esf:value>A wire component which logs data as received from upstream connected Wire Components</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="log.verbosity" type="String">
+                <esf:value>VERBOSE</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="componentName" type="String">
+                <esf:value>Logger</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="service.factoryPid" type="String">
+                <esf:value>org.eclipse.kura.wire.Logger</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="kura.service.pid" type="String">
+                <esf:value>logger</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="service.pid" type="String">
+                <esf:value>org.eclipse.kura.wire.Logger-1628881753947-0</esf:value>
+            </esf:property>
+        </esf:properties>
+    </esf:configuration>
+    <esf:configuration pid="org.eclipse.kura.wire.graph.WireGraphService">
+        <esf:properties>
+            <esf:property array="false" encrypted="false" name="WireGraph" type="String">
+                <esf:value>{"components":[{"pid":"Chirpstack","inputPortCount":0,"outputPortCount":1,"renderingProperties":{"position":{"x":-500,"y":-240},"inputPortNames":{},"outputPortNames":{}}},{"pid":"logger","inputPortCount":1,"outputPortCount":0,"renderingProperties":{"position":{"x":80,"y":-240},"inputPortNames":{},"outputPortNames":{}}}],"wires":[{"emitter":"Chirpstack","emitterPort":0,"receiver":"logger","receiverPort":0}]}</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="kura.service.pid" type="String">
+                <esf:value>org.eclipse.kura.wire.graph.WireGraphService</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="service.pid" type="String">
+                <esf:value>org.eclipse.kura.wire.graph.WireGraphService</esf:value>
+            </esf:property>
+        </esf:properties>
+    </esf:configuration>
+</esf:configurations>

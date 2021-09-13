@@ -1,0 +1,21 @@
+#!/bin/sh
+
+TMP_IPTABLES_BACKUP=/tmp/esf-iptables-backup
+ADDON_IPTABLES=/opt/firewall-docker-workaround/addon-iptables
+
+# save the current ESF iptables
+iptables-save > $TMP_IPTABLES_BACKUP
+
+# Apply the add-on rules to iptables
+# Do not flush table (leave existing rules in place)
+iptables-restore --noflush < $ADDON_IPTABLES
+
+##
+# ESF can't parse some of the docker rules and it 
+# causes a crash, so we need to run following script
+# as a workaround.
+# It waits for ESF to write the backup $IPTABLES
+# file to disk, then replaces it with the file we generated
+# above
+##
+nohup /etc/init.d/firewall_cust_aux >>/var/log/kura-console.log 2>&1 &
