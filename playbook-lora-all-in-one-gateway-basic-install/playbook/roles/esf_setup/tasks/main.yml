@@ -190,7 +190,7 @@
         msg: "FAILURE: Packages failed to install within 30 seconds. Check EFS configuration and log for errors."
 
 #Apply snapshot containing config for Raw MQTT Cloud Connection and Artemis MQTT Broker
-- name: Apply Snapshot to ESF
+- name: Apply Raw MQTT Cloud Connection and Artemis MQTT Broker Settings Snapshot to ESF
   uri:
     url: "{{ esf_api_http_protocol }}://127.0.0.1/services/configuration/v1/snapshots/_upload"
     user: "{{esf_username}}"
@@ -282,43 +282,57 @@
     #   debug:
     #     var: network_properties
 
-    #This task filters the network configuration. 
-    #CONTEXT: Setting passwords with the API causes errors due to a bug.
-    #GOAL: Get a dictionary with only the Chirpbridge properties, without any password fields, and the Chirpbridge interface set to Not Managed.
-    #BREAKDOWN OF SET_FACT:
-    #1. network_properties: Start with the complete dictionary of network properties returned by the API
-    #2. combine(new_item): Replace the old property that disables Chirpbridge with a new one that sets Chirpbridge to Not Managed. 
-    #3. dict2items: Convert dictionary (which now has Not Managed property in it) to a list because selectattr/rejectattr require a list.
-    #4. selectattr('key', 'search', 'chirpbridge'): Filter to only the Chirpbridge configuration items by only allowing items that have 'chirpbridge' anywhere in the name. 
-    #5. rejectattr('key', 'search', 'password') | rejectattr('key', 'search', 'passphrase'): Remove any items that are passwords (passwords can be indicated by 'passphrase' or 'password' in the item name)
-    #6. list: convert the results from selectattr/rejectattr to a list. This is required as an intermediary step to converting the filtered results back to a dictionary so it can be used.  
-    #7. items2dict: convert the list to a dictionary. 
-    - name: Set chirpbridge to Not Managed (SKIP = ESF 7)
-      set_fact: 
-        network_properties: "{{ network_properties | combine(new_item) | dict2items | selectattr('key', 'search', 'chirpbridge') | rejectattr('key', 'search', 'password') | rejectattr('key', 'search', 'passphrase') | list | items2dict }}"
-      vars:
-        new_item: { 'net.interface.chirpbridge.config.ip4.status': 'netIPv4StatusUnmanaged'}
-      with_dict: "{{ network_properties }}"
+    # #This task filters the network configuration. 
+    # #CONTEXT: Setting passwords with the API causes errors due to a bug.
+    # #GOAL: Get a dictionary with only the Chirpbridge properties, without any password fields, and the Chirpbridge interface set to Not Managed.
+    # #BREAKDOWN OF SET_FACT:
+    # #1. network_properties: Start with the complete dictionary of network properties returned by the API
+    # #2. combine(new_item): Replace the old property that disables Chirpbridge with a new one that sets Chirpbridge to Not Managed. 
+    # #3. dict2items: Convert dictionary (which now has Not Managed property in it) to a list because selectattr/rejectattr require a list.
+    # #4. selectattr('key', 'search', 'chirpbridge'): Filter to only the Chirpbridge configuration items by only allowing items that have 'chirpbridge' anywhere in the name. 
+    # #5. rejectattr('key', 'search', 'password') | rejectattr('key', 'search', 'passphrase'): Remove any items that are passwords (passwords can be indicated by 'passphrase' or 'password' in the item name)
+    # #6. list: convert the results from selectattr/rejectattr to a list. This is required as an intermediary step to converting the filtered results back to a dictionary so it can be used.  
+    # #7. items2dict: convert the list to a dictionary. 
+    # - name: Set chirpbridge to Not Managed (SKIP = ESF 7)
+    #   set_fact: 
+    #     network_properties: "{{ network_properties | combine(new_item) | dict2items | selectattr('key', 'search', 'chirpbridge') | rejectattr('key', 'search', 'password') | rejectattr('key', 'search', 'passphrase') | list | items2dict }}"
+    #   vars:
+    #     new_item: { 'net.interface.chirpbridge.config.ip4.status': 'netIPv4StatusUnmanaged'}
+    #   with_dict: "{{ network_properties }}"
 
-    # - name: debug print network_properties after changing
-    #   debug:
-    #     var: network_properties
+    # # - name: debug print network_properties after changing
+    # #   debug:
+    # #     var: network_properties
 
-    - name: Apply network configuration update to ESF (SKIP = ESF 7)
+    # - name: Apply network configuration update to ESF (SKIP = ESF 7)
+    #   uri:
+    #     url: "{{ esf_api_http_protocol }}://127.0.0.1/services/configuration/v1/configurableComponents/configurations/byPid/org.eclipse.kura.net.admin.NetworkConfigurationService/_update"
+    #     user: "{{esf_username}}"
+    #     password: "{{esf_password}}"
+    #     status_code: 200
+    #     force_basic_auth: yes
+    #     validate_certs: no
+    #     method: POST
+    #     body_format: json
+    #     body:
+    #       takeSnapshot: true
+    #       componentConfigurationRequest:
+    #         properties: 
+    #           "{{ network_properties }}"
+
+    #Apply snapshot containing config for setting Chirpbridge to Not Managed
+    - name: Apply Chirpbridge Settings Update Snapshot to ESF (SKIP = ESF 7)
       uri:
-        url: "{{ esf_api_http_protocol }}://127.0.0.1/services/configuration/v1/configurableComponents/configurations/byPid/org.eclipse.kura.net.admin.NetworkConfigurationService/_update"
+        url: "{{ esf_api_http_protocol }}://127.0.0.1/services/configuration/v1/snapshots/_upload"
         user: "{{esf_username}}"
         password: "{{esf_password}}"
         status_code: 200
         force_basic_auth: yes
         validate_certs: no
         method: POST
-        body_format: json
-        body:
-          takeSnapshot: true
-          componentConfigurationRequest:
-            properties: 
-              "{{ network_properties }}"
+        headers: 
+          Content-Type: "application/xml" 
+        body: "{{lookup('url', aws_url+'/snapshots/chirpbridge_config_only_status.xml', errors='strict', split_lines=False)}}" #stream xml file directly from AWS 
       
     #Bounce Kura
     - name: Bounce Kura Block (ESF 6, log file) 
