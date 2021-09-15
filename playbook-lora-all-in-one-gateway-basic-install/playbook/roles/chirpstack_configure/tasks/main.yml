@@ -172,7 +172,7 @@
         serviceProfileID: "{{ serviceProfileID }}"
 
 #All tasks below this line are optional and provided for convenience and as examples. 
-#Simply uncomment them and change the set_fact section to reflect your real data. 
+#To Use: Uncomment the desired sections and change the relevant data to reflect your real data. 
 
 # #CREATE DEVICE PROFILE
 # #This example is for creating a TE 8911-A device profile. 
