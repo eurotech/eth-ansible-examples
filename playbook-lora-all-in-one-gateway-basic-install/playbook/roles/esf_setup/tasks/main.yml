@@ -3,127 +3,6 @@
   debug:
     msg: "ESF Setup"
 
-# #Install ESF
-# - name: Search for ESF package
-#   shell: rpm -qa | grep esf-reliagate-10-14
-#   args:
-#     warn: false
-#   register: rpm_output
-#   ignore_errors: yes
-
-# - name: Remove ESF
-#   command: rpm -e {{rpm_output.stdout}}
-#   args:
-#     warn: false
-#   when: "rpm_output.rc == 0"
-
-# - name: Remove ESF resources
-#   file:
-#     path: /opt/eurotech/esf
-#     state: absent
-
-# - name: Install ESF (for EL 27.0.2)
-#   command: rpm -ivh roles/esf_setup/files/esf_rpm/esf-reliagate-10-14-6.2.0-1.aarch64.rpm
-#   args:
-#     warn: false
-#   when: el_version == "EL_27.0.2"
-
-# # Workarounds for EL 27.1.0 RC
-# # Logrotate isn't installed in image, so we need to ignore dependencies
-# # the package isn't signed, so we need to ignore the signature
-# - name: Install ESF (for EL 27.1.0)
-#   command: rpm -ivh roles/esf_setup/files/esf_rpm/esf-reliagate-10-14-6.2.0-1.aarch64.rpm --nodeps --nosignature
-#   args:
-#     warn: false
-#   when: el_version == "EL_27.1.0"
-
-# #Configure ESF
-#     #remove old ESF snapshots
-# - name: Find ESF snapshots
-#   find:
-#     paths: 
-#       - /opt/eurotech/esf/user/snapshots
-#     patterns: "*.xml"
-#   register: esf_snapshots
-
-# - name: Remove existing ESF snapshots
-#   file:
-#     path: "{{ item.path }}"
-#     state: absent
-#   with_items: "{{ esf_snapshots.files }}"
-
-#     #copy DPs
-# - name: copy deployment packages 
-#   copy:
-#     src: packages/
-#     dest: /opt/eurotech/esf/packages
-#     mode: "0644"
-#   register: copy_dps
-
-# - name: ESF 6.2.0 Install Ansible/API Package
-#   block:
-#     - name: Ensure directory exists for Ansible/API Package (SKIP = ESF 7)
-#       file:
-#         path: "/opt/eurotech/esf/data/packages/"
-#         state: directory
-
-#     #Firewall Workaround Setup (EFS 6.2.0 only)
-#     - name: "EFS 6.2.0: Copy firewall workaround files (SKIP = EFS 7)"
-#       get_url: 
-#         url: "{{ item.src }}"
-#         dest: "{{ item.dest }}"
-#         mode: "{{ item.mode }}"
-#         checksum: "md5:{{ item.checksum }}"
-#       with_items:
-#         - { src: "{{ aws_url }}/firewall/addon-iptables", dest: /opt/firewall-docker-workaround/, mode: "0644", checksum: "{{ addon_iptables_md5 }}"}
-#         - { src: "{{ aws_url }}/firewall/firewall_cust", dest: /etc/init.d/, mode: "0755", checksum: "{{ firewall_cust_md5 }}" }
-#         - { src: "{{ aws_url }}/firewall/firewall_cust_aux", dest: /etc/init.d/, mode: "0755", checksum: "{{ firewall_cust_aux_md5 }}" }
-
-#     #modify dpa.properties (or create if it doesn't exist)
-#     - name: add deployment packages to ESF
-#       lineinfile:
-#         path: /opt/eurotech/esf/data/dpa.properties
-#         line: "com.eurotech.framework.ansible.feature=file\:/opt/eurotech/esf/data/packages/com.eurotech.framework.ansible.feature_1.0.0.dp"
-#         create: yes
-#         mode: "0644"
-#       with_items:
-#       register: modify_dpa
-
-#     - name: Restart Kura if deployment package(s) were changed
-#       block:
-#         #Bounce Kura
-#         - name: Restart ESF
-#           systemd:
-#             name: kura
-#             state: restarted
-
-#         #Get current time (log start time)
-#         - name: save current time
-#           command: 'date "+%Y-%m-%d %H:%M:%S"'
-#           register: logstarttime
-
-#         #Set fact for log start time
-#         - name: parse current time
-#           set_fact:
-#             log_start_time: "{{ logstarttime.stdout }}"
-
-#         - name: kura restart confirmation
-#           block:
-#             - name: wait for ESF to start up (this can take up to 4 minutes)
-#               command: 'journalctl --since "{{log_start_time}}"'
-#               register: systemlogs
-#               retries: 24
-#               delay: 10
-#               until: systemlogs.stderr.find("Registering SelfConfiguringComponent - org.eclipse.kura.web.Console....Done") != -1 or systemlogs.stdout.find("Registering SelfConfiguringComponent - org.eclipse.kura.web.Console....Done") != -1
-#               any_errors_fatal: true
-
-#           rescue:
-#             - name: ESF failed to restart within 4 minutes
-#               fail:
-#                 msg: "FAILURE: ESF failed to restart within 4 minutes. Check ESF log for errors."
-#       when: download_dps.changed or modify_dpa.changed #restart kura block when
-#   when: esf_major_version == "6" #install Ansible/API block when
-
 - name: Install Raw MQTT Package
   uri:
     url: "{{ esf_api_http_protocol }}://127.0.0.1/services/deploy/v1/_install"
@@ -274,53 +153,9 @@
         msg: "Chirpbridge network not found. Try again or contact Eurotech for support."
       when: '"net.interface.chirpbridge.config.ip4.status" not in network_properties.keys()'
 
-    # - name: debug print API response
-    #   debug:
-    #     var: network_config
-
-    # - name: debug print network_properties before changing
-    #   debug:
-    #     var: network_properties
-
-    # #This task filters the network configuration. 
-    # #CONTEXT: Setting passwords with the API causes errors due to a bug.
-    # #GOAL: Get a dictionary with only the Chirpbridge properties, without any password fields, and the Chirpbridge interface set to Not Managed.
-    # #BREAKDOWN OF SET_FACT:
-    # #1. network_properties: Start with the complete dictionary of network properties returned by the API
-    # #2. combine(new_item): Replace the old property that disables Chirpbridge with a new one that sets Chirpbridge to Not Managed. 
-    # #3. dict2items: Convert dictionary (which now has Not Managed property in it) to a list because selectattr/rejectattr require a list.
-    # #4. selectattr('key', 'search', 'chirpbridge'): Filter to only the Chirpbridge configuration items by only allowing items that have 'chirpbridge' anywhere in the name. 
-    # #5. rejectattr('key', 'search', 'password') | rejectattr('key', 'search', 'passphrase'): Remove any items that are passwords (passwords can be indicated by 'passphrase' or 'password' in the item name)
-    # #6. list: convert the results from selectattr/rejectattr to a list. This is required as an intermediary step to converting the filtered results back to a dictionary so it can be used.  
-    # #7. items2dict: convert the list to a dictionary. 
-    # - name: Set chirpbridge to Not Managed (SKIP = ESF 7)
-    #   set_fact: 
-    #     network_properties: "{{ network_properties | combine(new_item) | dict2items | selectattr('key', 'search', 'chirpbridge') | rejectattr('key', 'search', 'password') | rejectattr('key', 'search', 'passphrase') | list | items2dict }}"
-    #   vars:
-    #     new_item: { 'net.interface.chirpbridge.config.ip4.status': 'netIPv4StatusUnmanaged'}
-    #   with_dict: "{{ network_properties }}"
-
-    # # - name: debug print network_properties after changing
-    # #   debug:
-    # #     var: network_properties
-
-    # - name: Apply network configuration update to ESF (SKIP = ESF 7)
-    #   uri:
-    #     url: "{{ esf_api_http_protocol }}://127.0.0.1/services/configuration/v1/configurableComponents/configurations/byPid/org.eclipse.kura.net.admin.NetworkConfigurationService/_update"
-    #     user: "{{esf_username}}"
-    #     password: "{{esf_password}}"
-    #     status_code: 200
-    #     force_basic_auth: yes
-    #     validate_certs: no
-    #     method: POST
-    #     body_format: json
-    #     body:
-    #       takeSnapshot: true
-    #       componentConfigurationRequest:
-    #         properties: 
-    #           "{{ network_properties }}"
-
     #Apply snapshot containing config for setting Chirpbridge to Not Managed
+    #Due to bug in REST APIs for ESF 6, you must change network settings by applying a snapshot. The configuration REST API will fail to apply network settings. 
+    #This issue is resolved in ESF 7. 
     - name: Apply Chirpbridge Settings Update Snapshot to ESF (SKIP = ESF 7)
       uri:
         url: "{{ esf_api_http_protocol }}://127.0.0.1/services/configuration/v1/snapshots/_upload"
@@ -334,7 +169,16 @@
           Content-Type: "application/xml" 
         body: "{{lookup('url', aws_url+'/snapshots/chirpbridge_config_only_status.xml', errors='strict', split_lines=False)}}" #stream xml file directly from AWS 
       
-    #Bounce Kura
+    #Due to bug in REST APIs for ESF 6, applying new settings using the Configuration API or in some cases when applying via snapshot will cause
+    #the services to crash, or ESF to improperly invalidate the pointer to the services. 
+    #
+    #Kura MUST be restarted after applying these configuration changes to resolve the issue. 
+    #This issue is resolved in ESF 7.
+    #
+    #Since we adjusted Firewall settings with the Configuration API and applied a snapshot to adjust network settings (and no additional configuration changes are required after this point), 
+    #we must restart ESF now. 
+
+    #Restart ESF
     - name: Bounce Kura Block (ESF 6, log file) 
       block:
         - name: "Restart ESF: Setup variables (SKIP = ESF 7)"
@@ -365,33 +209,4 @@
         - name: ESF failed to restart within 6 minutes
           fail:
             msg: "FAILURE: ESF failed to restart within 6 minutes. Check ESF log for errors."
-
-    #ESF must be restarted after setting network properties due to a bug
   when: esf_major_version == "6" #block when
-
-
-#     #apply custom ESF settings
-# - name: copy custom ESF configuration files
-#   copy:
-#     src: "{{ item.src }}"
-#     dest: "{{ item.dest }}"
-#     mode: "0644"
-#   with_items:
-#     - { src: snapshots/snapshot_0.xml, dest: /opt/eurotech/esf/user/snapshots }
-#     - { src: security/cacerts.ks, dest: /opt/eurotech/esf/user/security }
-#     - { src: package_config/dpa.properties, dest: /opt/eurotech/esf/data }
-#     - { src: networking/interfaces, dest: /etc/network }
-#     - { src: networking/iptables, dest: /etc/sysconfig }
-#     - { src: networking/kuranet.conf, dest: /opt/eurotech/esf/user}
-
-# - name: copy custom ESF configuration files for EL 27.1.0
-#   copy:
-#     src: "{{ item.src }}"
-#     dest: "{{ item.dest }}"
-#     mode: "0644"
-#   with_items:
-#     - { src: logging_config/log4j.xml, dest: /opt/eurotech/esf/user} #set ESF to log using systemd journal logger
-#   when: el_version == "EL_27.1.0"
-
-# - name: import custom firewall rules
-#   shell: iptables-restore < /etc/sysconfig/iptables
