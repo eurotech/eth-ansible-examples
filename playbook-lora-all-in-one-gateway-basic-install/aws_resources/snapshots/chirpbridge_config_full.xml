@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?><esf:configurations xmlns:esf="http://eurotech.com/esf/2.0" xmlns:ocd="http://www.osgi.org/xmlns/metatype/v1.2.0">
+    <esf:configuration pid="org.eclipse.kura.net.admin.NetworkConfigurationService">
+        <esf:properties>
+            <esf:property array="false" encrypted="false" name="net.interface.chirpbridge.loopback" type="Boolean">
+                <esf:value>false</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="net.interface.chirpbridge.config.domains" type="String">
+                <esf:value/>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="net.interface.chirpbridge.virtual" type="Boolean">
+                <esf:value>false</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="net.interface.chirpbridge.config.ip4.address" type="String">
+                <esf:value/>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="net.interface.chirpbridge.driver" type="String">
+                <esf:value> bridge</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="net.interface.chirpbridge.config.ip4.prefix" type="Short">
+                <esf:value>-1</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="net.interface.chirpbridge.ptp" type="Boolean">
+                <esf:value>false</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="net.interface.chirpbridge.config.dhcpClient4.enabled" type="Boolean">
+                <esf:value>false</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="net.interface.chirpbridge.config.name" type="String">
+                <esf:value>chirpbridge</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="net.interface.chirpbridge.eth.link.up" type="Boolean">
+                <esf:value>false</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="net.interface.chirpbridge.config.state" type="String">
+                <esf:value>ACTIVATED</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="net.interface.chirpbridge.config.ip4.gateway" type="String">
+                <esf:value/>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="net.interface.chirpbridge.firmware.version" type="String">
+                <esf:value> N/A</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="net.interface.chirpbridge.up" type="Boolean">
+                <esf:value>true</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="net.interface.chirpbridge.config.mtu" type="Integer">
+                <esf:value>1500</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="net.interface.chirpbridge.driver.version" type="String">
+                <esf:value> 2.3</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="net.interface.chirpbridge.mac" type="String">
+                <esf:value>02:42:95:88:65:03</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="net.interface.chirpbridge.config.ip4.dnsServers" type="String">
+                <esf:value/>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="net.interface.chirpbridge.config.winsServers" type="String">
+                <esf:value/>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="net.interface.chirpbridge.config.autoconnect" type="Boolean">
+                <esf:value>false</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="net.interface.chirpbridge.config.ip4.status" type="String">
+                <esf:value>netIPv4StatusUnmanaged</esf:value>
+            </esf:property>
+            <esf:property array="false" encrypted="false" name="net.interface.chirpbridge.type" type="String">
+                <esf:value>ETHERNET</esf:value>
+            </esf:property>
+        </esf:properties>
+    </esf:configuration>
+</esf:configurations>

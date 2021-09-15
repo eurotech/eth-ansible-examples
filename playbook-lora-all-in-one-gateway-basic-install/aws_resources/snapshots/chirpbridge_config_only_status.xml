@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?><esf:configurations xmlns:esf="http://eurotech.com/esf/2.0" xmlns:ocd="http://www.osgi.org/xmlns/metatype/v1.2.0">
+    <esf:configuration pid="org.eclipse.kura.net.admin.NetworkConfigurationService">
+        <esf:properties>
+            <esf:property array="false" encrypted="false" name="net.interface.chirpbridge.config.ip4.status" type="String">
+                <esf:value>netIPv4StatusUnmanaged</esf:value>
+            </esf:property>
+        </esf:properties>
+    </esf:configuration>
+</esf:configurations>
