@@ -151,9 +151,9 @@
         gatewayProfileID: ''
         serviceProfileID: "{{ serviceProfileID }}"
 
-TESTING
-to make it easier, this will use the API to create the device profile and device for
-Abe's test 8911A
+#TESTING
+#to make it easier, this will use the API to create the device profile and device for
+#Abe's test 8911A
 
 - name: save test 8911A devEUI
   set_fact:
