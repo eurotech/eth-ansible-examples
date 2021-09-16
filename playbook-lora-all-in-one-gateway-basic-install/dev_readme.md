@@ -12,6 +12,7 @@ ToDo:
 
 * Verify that NPE after API config changes is resolved in ESF 7 RC Release 80 (RC5?). Talk to Marcello Martina if not.
 * Add Kura restart after firewall config change? This is only needed until the fix above is implemented in ESF.
+* Allow for kura.log or journald logging on ESF 6.2.0
 
 * adjust REST fail messages to point to troubleshooting section of documentation?
 
