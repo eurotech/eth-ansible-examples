@@ -1,4 +1,7 @@
 ToDo:
+* Parse and adjust docker daemon.json instead of assuming logging is enabled if the file already exists. 
+* Change the wire graph snapshot to merging in instead of replacing, or remove entirely. 
+
 * Add notice to documentation that ESF web console if open during installation may show "failed to install package" (CONFIRM THIS ERROR) if the packages are already installed. This can be safely ignored. 
 * Document passing in custom ESF credentials
 * document that docker logging is NOT enabled if daemon.json already exists!
