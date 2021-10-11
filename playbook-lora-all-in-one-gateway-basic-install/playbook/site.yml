@@ -27,6 +27,11 @@
     #If EFS 7 is in use, they will be changed in the validate_environment role
     esf_api_http_protocol: "http" #EFS 6.2.0: http; EFS 7: https
     esf_password: "admin" #EFS 6.2.0: "admin"; EFS 7: serial number
+
+    #Hardware specific variables
+    #These variables are set by default to the ReliaGATE 10-14. 
+    #If other hardware is in use, they will be changed in the validate_environment role
+    image_arch: "arm64v8"
     
     #AWS file storage base address (does NOT include trailing slash)
     aws_url: "http://eth-inc-sw.s3.amazonaws.com/lora/ansible-lora-install-support-files"
