@@ -21,9 +21,6 @@ ToDo:
 
 * Pull correct chirpstack (and other?) images for architecture 
 
-* Remove debug statement from validate environment
-* Make failure on 404 check for API access fatal
-* Add time limit statement on "wait for ESF to finish restarting" step, esf config
 * Add EL 27.1 support to 10-12
 * Add ESF 7 support to 10-12? Is this needed or does it already exist?
 
