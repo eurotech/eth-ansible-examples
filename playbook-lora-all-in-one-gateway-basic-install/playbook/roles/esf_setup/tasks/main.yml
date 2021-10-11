@@ -184,7 +184,7 @@
         - name: "Restart ESF: Setup variables (SKIP = ESF 7)"
           set_fact:
             tmp_tail_log_file: /tmp/tail_file.out
-            timeout_value: 400 # async should terminate the task, but linux timeout command is used below as well for backup
+            timeout_value: 600 # async should terminate the task, but linux timeout command is used below as well for backup
             log_file: /var/log/kura.log
             
         - name: "Restart ESF: Setup and start temporary shadow log (SKIP = ESF 7)"
