@@ -38,7 +38,7 @@
     - gw_model != gw_1014
 
 - name: Set Variables for Hardware other than ReliaGATE 10-14 (SKIP = Hardware is ReliaGATE 10-14)
-  set_facts:
+  set_fact:
     image_arch: "arm32v7"
 
 ##Check EL Version
