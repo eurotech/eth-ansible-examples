@@ -19,6 +19,17 @@ ToDo:
 
 * Add link to gh-docs for documentation. 
 
+* Pull correct chirpstack (and other?) images for architecture 
+
+* Remove debug statement from validate environment
+* Make failure on 404 check for API access fatal
+* Add time limit statement on "wait for ESF to finish restarting" step, esf config
+
+need to document:
+-ansible supplement package installed
+-change rest password to admin if gateway doesn't have default password for EFS 6
+-some of the wait for startup stuff will show failures until a success, that is normal
+
 MQTT Broker Credentials
 UN: LoRaMQTTUser
 PW: LoRaMQTTpw
