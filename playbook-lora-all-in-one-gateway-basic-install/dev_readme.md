@@ -3,7 +3,7 @@ ToDo:
 * Change the wire graph snapshot to merging in instead of replacing, or remove entirely. 
 
 * Add notice to documentation that ESF web console if open during installation may show "failed to install package" (CONFIRM THIS ERROR) if the packages are already installed. This can be safely ignored. 
-* Document passing in custom ESF credentials
+* Document passing in custom credentials
 * document that docker logging is NOT enabled if daemon.json already exists!
 * document lora installer file version
 * document that for 6.2.0, ansible package must be installed and configured with user assets;deploy;configuration
@@ -25,8 +25,7 @@ ToDo:
 * Add ESF 7 support to 10-12? Is this needed or does it already exist?
 
 need to document:
--ansible supplement package installed
--change rest password to admin if gateway doesn't have default password for EFS 6
+-ansible supplement package installed...default username/password
 -some of the wait for startup stuff will show failures until a success, that is normal
 
 MQTT Broker Credentials
