@@ -51,16 +51,16 @@
 
 - name: chirpstack application server start confirmation
   block:
-    - name: wait for chirpstack application server to start up (this can take up to 3 minutes)
+    - name: wait for chirpstack application server to start up (this can take up to 10 minutes)
       command: docker logs chirpstack-application-server
       register: caslogs
-      retries: 18
+      retries: 60
       delay: 10
       until: caslogs.stderr.find("starting join-server api") != -1 or caslogs.stdout.find("starting join-server api") != -1
       any_errors_fatal: true
       changed_when: false
 
   rescue:
-    - name: Chirpstack application server failed to start within 3 minutes
+    - name: Chirpstack application server failed to start within 10 minutes
       fail:
-        msg: "FAILURE: Chirpstack Application Server failed to start within 3 minutes. Check TE Sensor Demo Kit Assembly Instructions for troubleshooting steps to take."
+        msg: "FAILURE: Chirpstack Application Server failed to start within 10 minutes. Check TE Sensor Demo Kit Assembly Instructions for troubleshooting steps to take."

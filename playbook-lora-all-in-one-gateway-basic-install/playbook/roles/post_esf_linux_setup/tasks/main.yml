@@ -13,7 +13,7 @@
 #LoRa setup
     
     #redis
-- name: pull redis image from ECR
+- name: pull redis image from DockerHub
   command: docker pull redis:6.2.1-alpine3.13
   register: docker_result
   changed_when: docker_result.stdout is not search("Image is up to date")
@@ -26,19 +26,19 @@
 
 - name: redis server start confirmation block
   block:
-    - name: wait for redis server to start up (this can take up to 1 minute)
+    - name: wait for redis server to start up (this can take up to 3 minutes)
       command: docker logs redis-chirpstack
       register: redislogs
-      retries: 6
+      retries: 18
       delay: 10
       until: redislogs.stderr.find("Ready to accept connections") != -1 or redislogs.stdout.find("Ready to accept connections") != -1
       any_errors_fatal: true
       changed_when: false
 
   rescue:
-    - name: Redis server failed to start within 1 minute
+    - name: Redis server failed to start within 3 minutes
       fail:
-        msg: "FAILURE: Redis server failed to start within 1 minute. Check TE Sensor Demo Kit Assembly Instructions for troubleshooting steps to take."
+        msg: "FAILURE: Redis server failed to start within 3 minutes. Check TE Sensor Demo Kit Assembly Instructions for troubleshooting steps to take."
     
     #postgres
 - name: Ensure directory exists for PostGreSQL support files
@@ -59,7 +59,7 @@
     - { src: "{{ aws_url }}/postgres_init/003-chirpstack_as_trgm.sh", checksum: "{{ postgres_init_3_md5 }}"}
     - { src: "{{ aws_url }}/postgres_init/004-chirpstack_as_hstore.sh", checksum: "{{ postgres_init_4_md5 }}"}
 
-- name: pull postgres image from ECR
+- name: pull postgres image from DockerHub
   command: docker pull postgres:9.6.21-alpine
   register: docker_result
   changed_when: docker_result.stdout is not search("Image is up to date")
@@ -72,10 +72,10 @@
 
 - name: postgres server start confirmation
   block:
-    - name: wait for Postgres server to start up (this can take up to 3 minutes)
+    - name: wait for Postgres server to start up (this can take up to 6 minutes)
       command: docker logs postgres-chirpstack
       register: postgreslogs
-      retries: 18
+      retries: 36
       delay: 10
       until: >-
         postgreslogs.stderr | regex_search("PostgreSQL init process complete; ready for start up\\.\n\nLOG.  database system was shut down at .*$\nLOG.  MultiXact member wraparound protections are now enabled$\nLOG.  database system is ready to accept connections$\nLOG.  autovacuum launcher started") != ""
@@ -85,9 +85,9 @@
       changed_when: false
 
   rescue:
-    - name: Postgres server failed to start within 3 minutes
+    - name: Postgres server failed to start within 6 minutes
       fail:
-        msg: "FAILURE: Postgres server failed to start within 3 minutes. Check TE Sensor Demo Kit Assembly Instructions for troubleshooting steps to take."
+        msg: "FAILURE: Postgres server failed to start within 6 minutes. Check TE Sensor Demo Kit Assembly Instructions for troubleshooting steps to take."
 
     #packet forwarder
 - name: copy packet forwarder monit conf file
@@ -132,23 +132,18 @@
 
 - name: packet forwarder start confirmation
   block:
-    - name: wait for packet forwarder log to indicate packet forwarder is successfully started (this can take up to 3 minutes)
+    - name: wait for packet forwarder log to indicate packet forwarder is successfully started (this can take up to 10 minutes)
       wait_for:
         path: /var/log/lora-pkt-fwd.log
         search_regex: 'JSON up:'
         state: present
         delay: 0
         sleep: 20
-        timeout: 180
+        timeout: 600
       any_errors_fatal: true
       changed_when: false
 
   rescue:
-    - name: Packet forwarder failed to start within 3 minutes
+    - name: Packet forwarder failed to start within 10 minutes
       fail:
-        msg: "FAILURE: Packet forwarder failed to start within 3 minutes. Check TE Sensor Demo Kit Assembly Instructions for troubleshooting steps to take."
-
-# - name: start ESF
-#   systemd:
-#     name: kura
-#     state: started
+        msg: "FAILURE: Packet forwarder failed to start within 10 minutes. Check TE Sensor Demo Kit Assembly Instructions for troubleshooting steps to take."
