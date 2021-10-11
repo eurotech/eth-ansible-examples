@@ -96,10 +96,6 @@
   debug:
     msg: "Detected ESF Version: {{ esf_version }}. This is ESF {{ esf_major_version }}."
 
-- name: type debug
-  debug:
-    msg: "{{esf_major_version | type_debug}}"
-
 - name: Verify ESF Version is Valid
   fail: 
     msg: "ESF must be version 6.2.0 or later, but was {{ esf_version }}.   
@@ -152,7 +148,6 @@
         validate_certs: no
         method: GET
         return_content: yes
-
       register: rest_config_results
 
     - name: Check for REST Deploy API Access (SKIP = ESF 7)
