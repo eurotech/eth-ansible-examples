@@ -50,7 +50,7 @@
 - name: Reload docker to apply docker daemon config changes (SKIP = config wasn't changed)
   systemd:
     name: docker
-    state: reloaded
+    state: restarted
   when: get_url_results.changed #skip if daemon.json wasn't changed in previous task
 
 #Create chirpstack Docker bridge network
