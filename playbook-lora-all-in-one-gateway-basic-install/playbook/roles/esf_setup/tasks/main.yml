@@ -169,6 +169,21 @@
           Content-Type: "application/xml" 
         body: "{{lookup('url', aws_url+'/snapshots/chirpbridge_config_only_status.xml', errors='strict', split_lines=False)}}" #stream xml file directly from AWS 
       
+    #Modify kuranet.conf
+    #ESF doesn't always update this file as it should due to the configuration bugs discussed above/below.
+    #This task ensures the file is correct before restarting ESF
+    - name: Ensure kuranet.conf is correct for Chirpbridge network
+      lineinfile:
+        path: /opt/eurotech/esf/user/kuranet.conf
+        state: present
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+      loop:
+        - { regexp: "net\\.interface\\.chirpbridge\\.config\\.nat\\.enabled=", line: "net.interface.chirpbridge.config.nat.enabled=false"}
+        - { regexp: "net\\.interface\\.chirpbridge\\.config\\.dhcpServer4\\.passDns=", line: "net.interface.chirpbridge.config.dhcpServer4.passDns=false"}
+        - { regexp: "net\\.interface\\.chirpbridge\\.config\\.dhcpServer4\\.enabled=", line: "net.interface.chirpbridge.config.dhcpServer4.enabled=false" }
+        - { regexp: "net\\.interface\\.chirpbridge\\.config\\.ip4\\.status=", line: "net.interface.chirpbridge.config.ip4.status=netIPv4StatusUnmanaged"}  
+    
     #Due to bug in REST APIs for ESF 6, applying new settings using the Configuration API or in some cases when applying via snapshot will cause
     #the services to crash, or ESF to improperly invalidate the pointer to the services. 
     #
