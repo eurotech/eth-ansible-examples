@@ -5,3 +5,4 @@ TMP_IPTABLES_BACKUP=/tmp/esf-iptables-backup
 
 sleep 2
 mv $TMP_IPTABLES_BACKUP $ESF_IPTABLES_CONFIG
+sed -i 's/-A PREROUTING -m addrtype --dst-type LOCAL -j DOCKER//g' $ESF_IPTABLES_CONFIG
