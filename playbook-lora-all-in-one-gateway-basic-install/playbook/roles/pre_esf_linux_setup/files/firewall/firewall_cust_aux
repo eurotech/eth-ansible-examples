@@ -1,7 +1,0 @@
-#!/bin/sh
-
-ESF_IPTABLES_CONFIG=/etc/sysconfig/iptables
-TMP_IPTABLES_BACKUP=/tmp/esf-iptables-backup
-
-sleep 2
-mv $TMP_IPTABLES_BACKUP $ESF_IPTABLES_CONFIG
