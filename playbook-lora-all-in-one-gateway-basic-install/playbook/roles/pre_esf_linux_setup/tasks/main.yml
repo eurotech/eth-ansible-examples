@@ -46,8 +46,8 @@
     force: no #If file already exists, download-compare-replace operation will not be executed
   register: get_url_results
   
-# If docker daemon config was changed, reload docker to apply changes
-- name: Reload docker to apply docker daemon config changes (SKIP = config wasn't changed)
+# If docker daemon config was changed, restart docker to apply changes
+- name: Restart docker to apply docker daemon config changes (SKIP = config wasn't changed)
   systemd:
     name: docker
     state: restarted
