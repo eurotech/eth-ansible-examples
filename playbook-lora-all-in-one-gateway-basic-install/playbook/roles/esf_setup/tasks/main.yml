@@ -192,6 +192,8 @@
       lineinfile:
         path: /etc/sysconfig/iptables
         state: absent 
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
       loop:
         - { regexp: "-A POSTROUTING -s 172\\.18\\.0\\.4\\/32 -d 172\\.18\\.0\\.4\\/32 -p udp -m udp --dport 1700 -j MASQUERADE" }
         - { regexp: "-A POSTROUTING -s 172\\.18\\.0\\.6\\/32 -d 172\\.18\\.0\\.6\\/32 -p tcp -m tcp --dport 8080 -j MASQUERADE" }
