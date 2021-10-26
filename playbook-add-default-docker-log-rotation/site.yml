@@ -1,0 +1,49 @@
+# This script creates a default configuration file for Docker that includes basic log rotation.
+# This log rotation will be applied to all containers created after the playbook is ran (unlesss overridden
+# by explicit options supplied to the Docker run command).
+
+# This script will remove all containers. The user will need to recreate the containers, so that the containers
+# will use the new logging options.
+# This can be done by adding steps to this script, or any other method that the user prefers.
+
+# The Docker config file provided sets the log rotation options to 10 MB logs with a maximum of 3 log files per container.
+# These options can be changed to meet the user's needs.
+
+- name: Add default Docker log rotation behavior
+  hosts: localhost
+  connection: local
+
+  tasks:
+    # Copy Docker configuration file with log rotation options
+    # This will overwrite any existing Docker config file on the system
+    - name: Copy Docker daemon config file
+      copy:
+        dest: "/etc/docker/daemon.json"
+        src: "daemon.json"
+        mode: "0644"
+      
+    # Restart Docker to apply changes
+    - name: Restart Docker to apply docker daemon config changes
+      systemd:
+        name: docker
+        state: restarted
+
+    # Remove all Docker containers (if any)
+    # Containers must be stopped and then removed
+    - name: stop all Docker containers
+      shell: "docker stop $(docker ps -aq)"
+      register: docker_result
+      failed_when: # List implies logical "AND" between all list items
+        - docker_result.stderr != "" # An error occurred
+        - docker_result.stderr is not search("No such container:") # Ignore "container not found" errors
+      changed_when: docker_result.stderr is not search("No such container:") # Container(s) were found
+
+    - name: remove all Docker containers
+      shell: "docker rm $(docker ps -aq)"
+      register: docker_result
+      failed_when: # List implies logical "AND" between all list items
+        - docker_result.stderr != "" # An error occurred
+        - docker_result.stderr is not search("No such container:") # Ignore "container not found" errors
+      changed_when: docker_result.stderr is not search("No such container:") # Container(s) were found
+
+      # Containers should be recreated below here (if desired)
