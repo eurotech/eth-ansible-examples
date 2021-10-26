@@ -5,9 +5,10 @@
   vars:
     #List of OTAA Sensors
     #This is is the list that is used in the chirpstack_configure role 
-    # otaa_sensor_list:
-    #   - { devEUI: 'ABCDEF123', appKEY: 'ABCDEFABCDEFABCDEF123' }
-    #   - { devEUI: '321FEDCBA', appKEY: 'FEDCBAFEDCBAFEDCBA123' }
+    #This functionality is commented by default. See details in the chirpstack_configure role to enable it
+    #otaa_sensor_list:
+    #  - { devEUI: 'ABCDEF123AAAABBB', appKEY: 'ABCDEFABCDEFABCDEF123AAAAABBBBBC' }
+    #  - { devEUI: '321FEDCBABBBBAAA', appKEY: 'FEDCBAFEDCBAFEDCBA123BBBBBAAAAAC' }
 
     gw_1012: "ReliaGATE 10-12"
     gw_1014: "ReliaGATE 10-14"
