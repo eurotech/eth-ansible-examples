@@ -7,8 +7,8 @@
     #This is is the list that is used in the chirpstack_configure role 
     #This functionality is commented by default. See details in the chirpstack_configure role to enable it
     #otaa_sensor_list:
-    #  - { devEUI: 'ABCDEF123AAAABBB', appKEY: 'ABCDEFABCDEFABCDEF123AAAAABBBBBC' }
-    #  - { devEUI: '321FEDCBABBBBAAA', appKEY: 'FEDCBAFEDCBAFEDCBA123BBBBBAAAAAC' }
+    #  - { name: 'example_te_8911_1' , description: 'Example TE 8911 Sensor #1', devEUI: 'ABCDEF123AAAABBB', appKEY: 'ABCDEFABCDEFABCDEF123AAAAABBBBBC' }
+    #  - { name: 'example_te_8911_2' , description: 'Example TE 8911 Sensor #2', devEUI: '321FEDCBABBBBAAA', appKEY: 'FEDCBAFEDCBAFEDCBA123BBBBBAAAAAC' } 
 
     gw_1012: "ReliaGATE 10-12"
     gw_1014: "ReliaGATE 10-14"
