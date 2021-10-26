@@ -184,15 +184,19 @@
         - { regexp: "net\\.interface\\.chirpbridge\\.config\\.dhcpServer4\\.enabled=", line: "net.interface.chirpbridge.config.dhcpServer4.enabled=false" }
         - { regexp: "net\\.interface\\.chirpbridge\\.config\\.ip4\\.status=", line: "net.interface.chirpbridge.config.ip4.status=netIPv4StatusUnmanaged"}  
     
-    #Remove iptable entry that causes the ESF firewall service to crash
+    #Remove iptable entries that cause the ESF firewall service to crash
     #There is a known bug that will cause the ESF firewall service to crash when it parses the Linux iptables file when it contains certain rules.
-    #Docker inserts one of these rules. This step removes it and prevents the firewall service from crashing on startup of ESF.
-    #The firewall_cust workaround automatically inserts the rule that docker requires after the firewall service is initiated. 
+    #Docker inserts some of these rules. This step removes them and prevents the firewall service from crashing on startup of ESF.
+    #The firewall_cust workaround automatically inserts the rules that docker requires after the firewall service is initiated. 
     - name: Remove firewall rule from saved system iptables file (SKIP = ESF 7)
       lineinfile:
         path: /etc/sysconfig/iptables
-        state: absent
-        regexp: "-A PREROUTING -m addrtype --dst-type LOCAL -j DOCKER"
+        state: absent 
+      loop:
+        - { regexp: "-A POSTROUTING -s 172\\.18\\.0\\.4\\/32 -d 172\\.18\\.0\\.4\\/32 -p udp -m udp --dport 1700 -j MASQUERADE" }
+        - { regexp: "-A POSTROUTING -s 172\\.18\\.0\\.6\\/32 -d 172\\.18\\.0\\.6\\/32 -p tcp -m tcp --dport 8080 -j MASQUERADE" }
+        - { regexp: "-A PREROUTING -m addrtype --dst-type LOCAL -j DOCKER" }
+
 
     #Due to bug in REST APIs for ESF 6, applying new settings using the Configuration API or in some cases when applying via snapshot will cause
     #the services to crash, or ESF to improperly invalidate the pointer to the services. 
