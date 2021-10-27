@@ -39,8 +39,8 @@
 
     #MD5's of files to download
     addon_iptables_md5: "c0e7819c458f5ba39fb82601060bafbb"
-    firewall_cust_md5: "d3f332b02ed14b72d1b211bddd3fceab"
-    firewall_cust_aux_md5: "da8f14cc2bf3ce9691c9d41b8908d25f"
+    firewall_cust_md5: "a1ffa9f6a7dc9fb76d1b0efc0379a178"
+    firewall_cust_aux_md5: "daf06634ca094df925c932bddd257562"
     postgres_init_1_md5: "52d9b10a4d6323e1327a23c8577854ed"
     postgres_init_2_md5: "24d4adb3052298d9c338350a38eb738a"
     postgres_init_3_md5: "55a43197cdb8fa034d577c77feb5669f"

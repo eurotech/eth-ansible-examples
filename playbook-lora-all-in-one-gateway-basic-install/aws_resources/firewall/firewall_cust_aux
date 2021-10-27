@@ -1,10 +1,13 @@
 #!/bin/sh
 
-ESF_IPTABLES_CONFIG=/etc/sysconfig/iptables
-TMP_IPTABLES_BACKUP=/tmp/esf-iptables-backup
+LINUX_IPTABLES_PERSIST_FILE=/etc/sysconfig/iptables
 
+# wait for ESF Firewall Service to complete its procedure
+# this waiting period also prevents a race condition on the writelock for the
+# iptables file.
 sleep 2
-mv $TMP_IPTABLES_BACKUP $ESF_IPTABLES_CONFIG
-sed -i 's/-A PREROUTING -m addrtype --dst-type LOCAL -j DOCKER//g' $ESF_IPTABLES_CONFIG
-sed -i 's/-A POSTROUTING -s 172\.18\.0\.4\/32 -d 172\.18\.0\.4\/32 -p udp -m udp --dport 1700 -j MASQUERADE//g' $ESF_IPTABLES_CONFIG
-sed -i 's/-A POSTROUTING -s 172\.18\.0\.6\/32 -d 172\.18\.0\.6\/32 -p tcp -m tcp --dport 8080 -j MASQUERADE//g' $ESF_IPTABLES_CONFIG
+
+#remove rules from the persistant iptables file that cause the ESF firewall service to crash
+sed -i 's/-A PREROUTING -m addrtype --dst-type LOCAL -j DOCKER//g' $LINUX_IPTABLES_PERSIST_FILE
+sed -i 's/-A POSTROUTING -s 172\.18\.0\.4\/32 -d 172\.18\.0\.4\/32 -p udp -m udp --dport 1700 -j MASQUERADE//g' $LINUX_IPTABLES_PERSIST_FILE
+sed -i 's/-A POSTROUTING -s 172\.18\.0\.6\/32 -d 172\.18\.0\.6\/32 -p tcp -m tcp --dport 8080 -j MASQUERADE//g' $LINUX_IPTABLES_PERSIST_FILE

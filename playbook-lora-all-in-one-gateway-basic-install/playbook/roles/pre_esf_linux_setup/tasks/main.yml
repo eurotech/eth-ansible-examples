@@ -28,9 +28,6 @@
         - { src: "{{ aws_url }}/firewall/addon-iptables", dest: /opt/firewall-docker-workaround/, mode: "0644", checksum: "{{ addon_iptables_md5 }}"}
         - { src: "{{ aws_url }}/firewall/firewall_cust", dest: /etc/init.d/, mode: "0755", checksum: "{{ firewall_cust_md5 }}" }
         - { src: "{{ aws_url }}/firewall/firewall_cust_aux", dest: /etc/init.d/, mode: "0755", checksum: "{{ firewall_cust_aux_md5 }}" }
-
-    - name: Import custom firewall rules into system (SKIP = ESF 7)
-      shell: iptables-restore -n < /etc/sysconfig/iptables
   when: esf_major_version == "6" #block when
 
 # Docker Configuration for Log Rotation

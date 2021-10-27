@@ -1,21 +1,53 @@
 #!/bin/sh
 
-TMP_IPTABLES_BACKUP=/tmp/esf-iptables-backup
+# The firewall workaround servers two functions:
+# 1. Resolve the conflicts between docker and the ESF 6 firewall service
+#    that introdcue a race condition
+# 2. Resolve the known issue of certain firewall rules crashing the ESF 6
+#    firewall service
+#
+# This is accomplished using two files. This file, and the second script file
+# firewall_cust_aux. This split is required because at a certian point in the 
+# ESF Firewall Service procedure, it will wait for this file to complete execution
+# before continuing. However, the steps in the firewall_cust_aux file must be
+# executed AFTER the ESF Firewall Service has completed its entire procuedure. 
+
+#####
+## Docker Firewall Rules Workaround
+####
+# This file resolves the docker-ESF race condition by simply applying the 
+# Docker firewall rules after ESF has modified the iptables.
+#
+# This script uses a known-good set of iptable rules for the default Docker 
+# configuration. Modifying the Docker configuration requires replacing this
+# known-good iptable rules file with an updated known-good iptable rules file. 
+
+#####
+## ESF Firewall Service Crash Issue Workaround
+#####
+# Linux has two sets of firewall rules:
+# 1. The currently active set of firewall rules. This is known as 
+#    in-memory iptables. 
+# 2. A savefile of firewall rules, which is used by the linux system
+#    to load firewall rules at boot. This file is also used by the ESF
+#    firewall service. This is known as the presistant iptables.
+#
+# There is a known bug where the ESF Firewall Service will crash
+# if certian types of firewall rules are in the persistant iptables.
+#
+# In order to resolve this, the problematic iptable rules must
+# be removed from the persistant iptables, and loaded into the 
+# in-memory iptables every time ESF makes a firewall change.
+#
+# This means the rules will always be active in the in-memory iptables, 
+# but will never remain in the persisant iptables file.  
+
+# location of the known-good
 ADDON_IPTABLES=/opt/firewall-docker-workaround/addon-iptables
 
-# save the current ESF iptables
-iptables-save > $TMP_IPTABLES_BACKUP
-
-# Apply the add-on rules to iptables
+# Apply the Docker add-on rules to iptables
 # Do not flush table (leave existing rules in place)
 iptables-restore --noflush < $ADDON_IPTABLES
 
-##
-# ESF can't parse some of the docker rules and it 
-# causes a crash, so we need to run following script
-# as a workaround.
-# It waits for ESF to write the backup $IPTABLES
-# file to disk, then replaces it with the file we generated
-# above
-##
+# run script 2
 nohup /etc/init.d/firewall_cust_aux >>/var/log/kura-console.log 2>&1 &
