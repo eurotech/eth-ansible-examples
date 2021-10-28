@@ -35,15 +35,15 @@
       register: docker_result
       failed_when: # List implies logical "AND" between all list items
         - docker_result.stderr != "" # An error occurred
-        - docker_result.stderr is not search("No such container:") # Ignore "container not found" errors
-      changed_when: docker_result.stderr is not search("No such container:") # Container(s) were found
+        - docker_result.stderr is not search("requires at least 1 argument") # Ignore error generated when there are no containers 
+      changed_when: docker_result.stderr is not search("requires at least 1 argument") # Container(s) were found and stopped
 
     - name: remove all Docker containers
       shell: "docker rm $(docker ps -aq)"
       register: docker_result
       failed_when: # List implies logical "AND" between all list items
         - docker_result.stderr != "" # An error occurred
-        - docker_result.stderr is not search("No such container:") # Ignore "container not found" errors
-      changed_when: docker_result.stderr is not search("No such container:") # Container(s) were found
+        - docker_result.stderr is not search("requires at least 1 argument") # Ignore error generated when there are no containers 
+      changed_when: docker_result.stderr is not search("requires at least 1 argument") # Container(s) were found and removed
 
       # Containers should be recreated below here (if desired)
