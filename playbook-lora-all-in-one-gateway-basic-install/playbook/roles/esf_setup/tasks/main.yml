@@ -69,18 +69,36 @@
         msg: "FAILURE: Packages failed to install within 2 minutes. Check EFS configuration and log for errors."
 
 #Apply snapshot containing config for Raw MQTT Cloud Connection and Artemis MQTT Broker
-- name: Apply Raw MQTT Cloud Connection and Artemis MQTT Broker Settings Snapshot to ESF
-  uri:
-    url: "{{ esf_api_http_protocol }}://127.0.0.1/services/configuration/v1/snapshots/_upload"
-    user: "{{esf_username}}"
-    password: "{{esf_password}}"
-    status_code: 200
-    force_basic_auth: yes
-    validate_certs: no
-    method: POST
-    headers: 
-      Content-Type: "application/xml" 
-    body: "{{lookup('url', aws_url+'/snapshots/LoRa_system_base_snapshot.xml', errors='strict', split_lines=False)}}" #stream xml file directly from AWS 
+#
+#This task must have the option to repeat. If the packages are already installed then the installation 
+#detection in the previous automatically succeeds even though the reinstallation isn't completed. 
+#In this state (in the middle of an installation), the system can refuse to accept a new snapshot
+#which fails this task. 
+#
+#To workaround we retry this task for a little longer than the maximum expected installation time.
+- name: upload snapshot
+  block:
+    - name: Apply Raw MQTT Cloud Connection and Artemis MQTT Broker Settings Snapshot to ESF (can take up to 2.5 minutes)
+      uri:
+        url: "{{ esf_api_http_protocol }}://127.0.0.1/services/configuration/v1/snapshots/_upload"
+        user: "{{esf_username}}"
+        password: "{{esf_password}}"
+        status_code: 200
+        force_basic_auth: yes
+        validate_certs: no
+        method: POST
+        headers: 
+          Content-Type: "application/xml" 
+        body: "{{lookup('url', aws_url+'/snapshots/LoRa_system_base_snapshot.xml', errors='strict', split_lines=False)}}" #stream xml file directly from AWS 
+      register: upload_snapshot_result
+      retries: 15
+      delay: 10
+      until: upload_snapshot_result is not failed
+    
+  rescue:
+    - name: Snapshot failed to apply within 2.5 minutes
+      fail:
+        msg: "FAILURE: Raw MQTT Cloud Connection and Artemis MQTT Broker Settings Snapshot failed to apply within 2.5 minutes. Check EFS configuration and log for errors."
 
 ##Add Open Port 1883 for interface Chirpbridge to Firewall
 #Get Current Firewall Config
