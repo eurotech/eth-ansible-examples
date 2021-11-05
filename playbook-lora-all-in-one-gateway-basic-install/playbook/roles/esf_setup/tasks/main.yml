@@ -129,7 +129,7 @@
         new_item: { 'firewall.open.ports': '{{ firewall_open_ports }};1883,tcp,0.0.0.0/0,chirpbridge,,,,#'}
       with_dict: "{{ firewall_properties }}"
 
-    - name: Apply firewall update to ESF (SKIP = port already open)
+    - name: Apply firewall update to ESF (can take up to 10 minutes) (SKIP = port already open)
       uri:
         url: "{{ esf_api_http_protocol }}://127.0.0.1/services/configuration/v1/configurableComponents/configurations/byPid/org.eclipse.kura.net.admin.FirewallConfigurationService/_update"
         user: "{{esf_username}}"
@@ -144,7 +144,15 @@
           componentConfigurationRequest:
             properties: 
               "{{ firewall_properties }}"
+        timeout: 60 #allow for slow ESF response on 10-12s
+      retries: 15
+      delay: 10
   when: firewall_open_ports is not search("1883,tcp,0.0.0.0/0,chirpbridge,,,,#") #block when
+
+  rescue:
+    - name: Firewall open ports failed to update within 10 minutes
+      fail:
+        msg: "FAILURE: The Firewall Open Ports list failed to apply within 10 minutes. Check EFS configuration and log for errors. You can try running the script again, or manually open port 1883 to the chirpbridge interface in ESF then run script again to bypass this error."
 
 ##ESF 6.2.0 Only: Set chirpbridge network to Not Managed by ESF 
 - name: Set chirpbridge network to not managed by ESF block
