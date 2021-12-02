@@ -171,8 +171,8 @@
         gatewayProfileID: ''
         serviceProfileID: "{{ serviceProfileID }}"
 
-All tasks below this line are optional and provided for convenience and as examples. 
-To Use: Uncomment the desired sections and change the relevant data to reflect your real data. 
+# All tasks below this line are optional and provided for convenience and as examples. 
+# To Use: Uncomment the desired sections and change the relevant data to reflect your real data. 
 
 #CREATE DEVICE PROFILE
 #This example is for creating a TE 8911-A device profile. 
