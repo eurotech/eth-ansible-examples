@@ -246,19 +246,19 @@
       Authorization: "Bearer {{ jwtToken }}"
     body: 
       device:
-        devEUI: "{{ items.devEUI }}"
-        name: "{{ items.name }}" 
+        devEUI: "{{ item.devEUI }}"
+        name: "{{ item.name }}" 
         applicationID: '1'
-        description: "{{ items.description }}" 
+        description: "{{ item.description }}" 
         deviceProfileID: "{{ deviceProfileID }}"
         skipFCntCheck: false
         referenceAltitude: 0
         isDisabled: false
-  loop: otaa_sensor_list 
+  loop: "{{ otaa_sensor_list }}" 
 
 - name: Create Keys for Example 8911-A Device(s) (OTAA Device)
   uri:
-    url: "http://localhost:8080/api/devices/{{ items.devEUI }}/keys"
+    url: "http://localhost:8080/api/devices/{{ item.devEUI }}/keys"
     method: POST
     body_format: json
     status_code: 200
@@ -270,10 +270,10 @@
     body: 
       deviceKeys:
         appKey: '00000000000000000000000000000000' #this must be all zeros for OTAA devices
-        devEUI: "{{ items.devEUI }}"
+        devEUI: "{{ item.devEUI }}"
         genAppKey: ''
-        nwkKey: "{{ items.appKEY }}"
-  loop: otaa_sensor_list 
+        nwkKey: "{{ item.appKEY }}"
+  loop: "{{ otaa_sensor_list }}" 
 
 # #CREATE A NEW CHIRPSTACK USER WITH ADMINISTRATOR RIGHTS
 # - name: save example new chirpstack user variables
