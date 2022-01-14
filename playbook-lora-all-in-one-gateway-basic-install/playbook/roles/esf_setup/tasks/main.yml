@@ -117,16 +117,24 @@
 #Parse Firewall Open Ports List and full firewall properties from URI response
 - name: Parse Firewall Open Ports List and Full Firewall Properties
   set_fact:
-    firewall_open_ports: "{{ firewall_config.json.properties.get('firewall.open.ports') }}"
+    firewall_open_ports: "{{ firewall_config.json.properties.get('firewall.open.ports').value }}"
+    firewall_open_ports_object: "{{ firewall_config.json.properties.get('firewall.open.ports') }}"
     firewall_properties: "{{ firewall_config.json.properties }}"
 
 - name: update firewall open ports list block
   block:
-    - name: Add Port 1883 for interface Chirpbridge to Firewall Open Ports List (SKIP = port already opened)
+    - name: Add Port 1883 for interface Chirpbridge to Firewall Open Ports List Object (SKIP = port already opened)
+      set_fact: 
+        firewall_open_ports_object: "{{ firewall_open_ports_object | combine(new_item) }}"
+      vars:
+        new_item: { 'value': '{{ firewall_open_ports }};1883,tcp,0.0.0.0/0,chirpbridge,,,,#'}
+      with_dict: "{{ firewall_open_ports_object }}"
+
+    - name: Update Firewall Config Object with new Open Ports Object (SKIP = port already opened)
       set_fact: 
         firewall_properties: "{{ firewall_properties | combine(new_item) }}"
       vars:
-        new_item: { 'firewall.open.ports': '{{ firewall_open_ports }};1883,tcp,0.0.0.0/0,chirpbridge,,,,#'}
+        new_item: { 'firewall.open.ports': '{{ firewall_open_ports_object }}'}
       with_dict: "{{ firewall_properties }}"
 
     - name: Apply firewall update to ESF (can take up to 10 minutes) (SKIP = port already open)
