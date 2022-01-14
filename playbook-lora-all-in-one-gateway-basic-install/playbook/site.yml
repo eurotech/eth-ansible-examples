@@ -35,7 +35,7 @@
     image_arch: "arm64v8"
     
     #AWS file storage base address (does NOT include trailing slash)
-    aws_url: "http://eth-inc-sw.s3.amazonaws.com/lora/ansible-lora-install-support-files"
+    aws_url: "http://eth-inc-sw.s3.amazonaws.com/lora/ansible-lora-install-support-files/0.3.0"
 
     #MD5's of files to download
     addon_iptables_md5: "c0e7819c458f5ba39fb82601060bafbb"
@@ -51,7 +51,7 @@
     cns_config_md5: "03d1f593f434cc47b57c0a7e056b9279"
     cgb_config_md5: "d436ceb9fcf745e4a7e70bc76b3d6f9c"
     docker_daemon_json_md5: "a6ba49cf41e8782fbe035a9a28e8fe69"
-    lora_installer_version_md5: "c46d926976e79a805b0e8111d7915c2c"
+    lora_installer_version_md5: "9b64d39b425b7bce22d5afcbb52edf80"
 
   roles:
     - validate_environment
