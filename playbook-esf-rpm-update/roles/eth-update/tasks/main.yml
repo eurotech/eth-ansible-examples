@@ -1,0 +1,4 @@
+- name: ensure job_id is defined
+  fail:
+    msg: job_id is not defined
+  when: job_id is undefined
