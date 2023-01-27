@@ -1,0 +1,14 @@
+- name: ESF upgrade
+  hosts: localhost
+  connection: local
+  gather_facts: True
+
+  roles:
+    - eth-update
+
+  tasks:   
+    - name: Upgrade via DNF
+      shell: "export JAVA_HOME=/usr/java; export PATH=$PATH:/usr/java/bin/; dnf upgrade -y {{ playbook_dir }}/esf-reliagate-10-14-el27_1-7.2.2-1.aarch64.rpm"
+    
+    - name: Reboot device
+      shell: reboot
