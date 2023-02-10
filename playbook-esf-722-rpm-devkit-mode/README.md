@@ -1,13 +1,19 @@
-# Upgrade ESF to 7.2.2 with RPM self contained
+# Configure devkit mode in ESF
 
-This playbook shows how to embed an rpm to the playbook package.
-The playbook will update via DNF ESF to 7.2.2 for a ReliaGATE 10-12 with EL 27.1.0.
-The playbook will obviously need to be customized for different combination of target devices/OS versions.
+This playbook can be executed locally or from remote (enabling the eth-aupdate role) to uninstall the current ESF and install 7.2.2 with provisioning enabled.
 
-## How to distribute
+The playbook exposes few properties:
+- esf_version
+- el_version
+- el_arch
 
-Make the needed changes to the playbook to adapt it to the target devices on the field.
-Just zip the content of the folder, upload it to the shared space.
-Configure a new EC activities entry as specified in the official EC documentation.
+That are needed to identify the package to install. In this case it defaults for a ReliaGATE 10-12 with EL 27.1.0.
+The properties can be overwritten during playbook invocation (feature not available for remote updates)
 
-Run a remote update on compatible targets.
+Additional variables available are: 
+- esf_installer_filename
+- esf_snapshots_dir
+
+The playbook can also restart the gateway. But the feature is currently commented.
+
+The ESF installer must be present on the same folder of the playbook prior to the playbook execution.
