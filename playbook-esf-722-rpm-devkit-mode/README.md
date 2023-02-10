@@ -17,3 +17,6 @@ Additional variables available are:
 The playbook can also restart the gateway. But the feature is currently commented.
 
 The ESF installer must be present on the same folder of the playbook prior to the playbook execution.
+
+The playbook installs the ESF RPM using DNF. Prior to the ESF installation, DNF cache is refreshed to load the EL GPG keys. Internet connection may be needed.
+If the Internet connection is not available, the DNF commands can be removed and the installation phase replaced with `rpm -ivh --nosignature <path>` 
