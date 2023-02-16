@@ -16,5 +16,5 @@
     - name: Upgrade via DNF
       shell: "dnf upgrade -y /tmp/updated.rpm"
     
-    - name: Reboot device
-      shell: reboot
+    - name: Schedule device reboot in one minute
+      shell: shutdown -r 1
