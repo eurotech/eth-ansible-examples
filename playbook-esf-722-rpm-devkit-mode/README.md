@@ -1,6 +1,6 @@
 # Configure devkit mode in ESF
 
-This playbook can be executed locally or from remote (enabling the eth-aupdate role) to uninstall the current ESF and install 7.2.2 with provisioning enabled.
+This playbook can be executed locally or from remote (enabling the eth-update role) to uninstall the current ESF and install 7.2.2 with provisioning enabled.
 
 The playbook exposes few properties:
 - esf_version
