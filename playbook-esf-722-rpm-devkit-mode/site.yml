@@ -1,0 +1,70 @@
+- name: ESF devkit mode
+  hosts: localhost
+  connection: local
+  gather_facts: True
+
+  vars:
+    # esf default variables
+    esf_version: 7.2.2-1
+    el_version: 10-12-el27_1
+    el_arch: cortexa8hf_neon
+    esf_installer_filename: esf-reliagate-{{ el_version }}-{{ esf_version }}.{{ el_arch }}.rpm
+    esf_snapshots_dir: /opt/eurotech/esf/user/snapshots
+
+  # roles:
+  #   - eth-update
+
+  tasks:  
+    - name: "Search for ESF package"
+      shell: rpm -qa | grep esf-reliagate
+      args:
+        warn: false
+      register: rpm_output
+      ignore_errors: yes
+
+    - name: "Remove ESF"
+      shell: rpm -e esf-reliagate-{{ el_version }}
+      become: true
+      args:
+        warn: false
+      when: "rpm_output.rc == 0" 
+    
+    - name: "Remove ESF resources"
+      file:
+        path: /opt/eurotech/esf
+        state: absent
+
+    #DNF
+    - name: Clean dnf metadata
+      shell: dnf clean metadata
+      args:
+        warn: false
+
+    - name: Dnf makecache
+      shell: dnf -y makecache
+      args:
+        warn: false
+
+    - name: Check that DNF can connect to the Eurotech package server
+      shell: dnf search nbench -y
+      args:
+        warn: false
+
+    - name: Install via DNF
+      shell: "dnf install -y {{ playbook_dir }}/{{ esf_installer_filename }}"
+
+    - name: Create snapshot_0 copy
+      copy:
+        src: "{{ esf_snapshots_dir }}/snapshot_0.xml"
+        dest: "{{ esf_snapshots_dir }}/snapshot_0_tmp.xml"
+
+    - name: Enable provisioning
+      shell: cat {{ esf_snapshots_dir }}/snapshot_0_tmp.xml | tr '\n' '\f' | sed -e 's/    <esf:configuration pid="org.eclipse.kura.provisioning.ProvisioningService">\f        <esf:properties>/\    <esf:configuration pid="org.eclipse.kura.provisioning.ProvisioningService">\f        <esf:properties>\f            <esf:property array="false" encrypted="false" name="enabled" type="Boolean">\f                <esf:value>true<\/esf:value>\f            <\/esf:property>\f            <esf:property array="false" encrypted="false" name="account-name" type="String">\f                <esf:value>eurotech-provision<\/esf:value>\f            <\/esf:property>\f            <esf:property array="false" encrypted="false" name="broker-url" type="String">\f                <esf:value>mqtts:\/\/broker-sandbox.everyware-cloud.com:8883\/<\/esf:value>\f            <\/esf:property>\f            <esf:property array="false" encrypted="true" name="password" type="Password">\f                <esf:value>V2UhY29tZTEyMzQ1<\/esf:value>\f            <\/esf:property>/g' | tr '\f' '\n' > {{ esf_snapshots_dir }}/snapshot_0.xml
+
+    - name: Remove file (delete file)
+      file:
+        path: "{{ esf_snapshots_dir }}/snapshot_0_tmp.xml"
+        state: absent
+
+    # - name: Reboot device
+    #   shell: reboot
