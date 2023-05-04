@@ -1,0 +1,14 @@
+- name: ESF upgrade
+  hosts: localhost
+  connection: local
+  gather_facts: True
+
+  roles:
+    - eth-update
+
+  tasks:   
+    - name: Upgrade via DNF
+      shell: "dnf upgrade -y {{ playbook_dir }}/esf.rpm"
+
+    - name: Schedule device reboot in one minute
+      shell: shutdown -r 1
