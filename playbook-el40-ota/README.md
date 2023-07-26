@@ -1,12 +1,9 @@
-# Playbook to upgrade ESF with RPM
+# Playbook to upgrade EL to EL 40 and migrate ESF to a generic profile
 
-This playbook shows how to embed an rpm in a playbook package to be then distributed via Everyware Cloud.
+This playbook shows how to upgrade EL 27.1.0 to EL 40 and migrate ESF to a generic profile via Everyware Cloud.
 
 ## Instructions
 
-- Download the ESF RPM for your target version
-- Copy it in the same folder as this README file. (It must be in the same directory as the site.yml file)
-- Rename the downloaded RPM as esf.rpm
 - Zip the folder content. The produced zip file must have the following files: **site.yml**, **esf.rpm** and the **roles** folder in the root dir, not contained in any subfolder
 
 ## Distribution
