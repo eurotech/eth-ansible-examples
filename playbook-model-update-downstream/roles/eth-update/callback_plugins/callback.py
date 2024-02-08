@@ -46,7 +46,7 @@ class CallbackModule(CallbackBase):
         try:
             self._execution_id = os.environ['ETH_EXECUTION_ID']
         except:
-            self._execution_id = str(int(time.time()))
+            self._execution_id = os.environ['ETH_JOB_ID']
             self._report_execution_started()
 
         try:
