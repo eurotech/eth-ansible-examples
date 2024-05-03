@@ -1,0 +1,21 @@
+- name: "Configure sudoers and add user to sudoers list"
+  hosts: localhost
+  connection: local
+  gather_facts: True
+
+  roles:
+    - eth-update
+
+  tasks:
+    - name: "Configure sudo group"
+      lineinfile:
+        path: /etc/sudoers
+        backrefs: yes
+        state: present
+        regexp: '^%sudo'
+        line: '%sudo ALL=(ALL) NOPASSWD: ALL'
+
+    - name: "Add customer user"
+      user: 
+        name: "newuser" 
+        group: sudo 
