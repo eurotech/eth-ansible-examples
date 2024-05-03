@@ -1,0 +1,6 @@
+job_id: "{{ lookup('env','ETH_JOB_ID') }}"
+eth_ansible_update_dir:  "/var/lib/eth-localexecution-area/localexecutions"
+executions_root: "{{ eth_ansible_update_dir }}/executions"
+job_dir: "{{ eth_ansible_update_dir }}/{{ job_id }}"
+required_executions_file: "{{ job_dir }}/required_executions"
+performed_executions_file: "{{ job_dir }}/performed_executions"
