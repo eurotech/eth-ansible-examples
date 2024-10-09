@@ -1,0 +1,34 @@
+- name: Create a new Container
+  hosts: localhost
+  connection: local
+
+  roles:
+    - eth-update
+
+  tasks:
+    - name: Create container
+      block:
+        - name: Create Container Http
+          uri:
+            url: https://127.0.0.1/services/configuration/v2/factoryComponents
+            user: "admin"
+            password: "12345678"
+            force_basic_auth: yes
+            validate_certs: no
+            method: POST
+            body: "{\"configs\": [{\"factoryPid\": \"org.eclipse.kura.container.provider.ContainerInstance\",\"pid\": \"CoolContainer\",\"properties\": {\"container.enabled\": {\"type\": \"BOOLEAN\",\"value\": true}}}],\"takeSnapshot\": true}"
+            body_format: json
+          register: uri_data
+      rescue:
+        - name: Create Container Http
+          uri:
+            url: https://127.0.0.1/services/configuration/v2/factoryComponents
+            user: "admin"
+            password: "12345678"
+            force_basic_auth: yes
+            validate_certs: no
+            method: POST
+            body: "{\"configs\": [{\"factoryPid\": \"org.eclipse.kura.container.provider.ContainerInstance\",\"pid\": \"CoolContainer\",\"properties\": {\"container.enabled\": {\"type\": \"BOOLEAN\",\"value\": true}}}],\"takeSnapshot\": true}"
+            body_format: json
+          register: uri_data
+      ignore_errors: yes
