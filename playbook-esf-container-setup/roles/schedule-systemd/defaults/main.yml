@@ -1,0 +1,7 @@
+playbook: site.yml
+extra_unit_items:
+extra_service_items:
+extra_install_items:
+start_task: ""
+retry_on_failure:
+extra_playbook_args:
