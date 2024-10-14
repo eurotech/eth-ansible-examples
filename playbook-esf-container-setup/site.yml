@@ -22,7 +22,7 @@
       rescue:
         - name: Create Container Http
           uri:
-            url: https://127.0.0.1/services/configuration/v2/factoryComponents
+            url: http://127.0.0.1/services/configuration/v2/factoryComponents
             user: "admin"
             password: "12345678"
             force_basic_auth: yes
