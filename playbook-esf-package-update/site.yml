@@ -9,7 +9,7 @@
     - name: Check ESF version
       shell: eth_vers_esf
       register: esf_version
-      
+
     - name: Backup ESF 6 dpa.properties
       copy:
         src: /opt/eurotech/esf/data/dpa.properties
@@ -20,16 +20,11 @@
         src: /opt/eurotech/esf/data/packages
         dest: /opt/eurotech/esf/data/packages.backup
       when: '"ESF_7." not in esf_version.stdout'
-    
+
     - name: Backup ESF 7 Packages folder
       copy:
         src: /opt/eurotech/esf/packages
         dest: /opt/eurotech/esf/packages.backup
-      when: '"ESF_7." in esf_version.stdout'
-
-    - name: Get default ESF 7 Password
-      shell: eth_serial_number
-      register: esf_default_admin_password
       when: '"ESF_7." in esf_version.stdout'
 
     - name: Install DP
@@ -37,8 +32,8 @@
         - name: Install DP Https
           uri:
             url: https://127.0.0.1/services/deploy/v1/_install
-            user: "admin"
-            password: "{{ esf_default_admin_password.stdout }}"
+            user: "maintenance"
+            password: "maintenance12345"
             force_basic_auth: yes
             validate_certs: no
             method: POST
@@ -90,7 +85,7 @@
             src: /opt/eurotech/esf/packages.backup
             dest: /opt/eurotech/esf/packages
       when: uri_data.status >= 400
-    
+
     - name: Restart esf
       shell: systemctl restart kura
       when: uri_data.status >= 400
