@@ -1,10 +1,10 @@
-# Playbook to upgrade an ESF package
+# Playbook to install Modbus and define a Modbus data retrieval scenario
 
 This playbook shows how to perform an ESF bundle upgrade via Everyware Cloud.
 
 ## Pre-requisites
 
-1. Download https://github.com/eurotech/eth-ansible-examples/tree/main/playbook-esf-package-update
+1. Download https://github.com/eurotech/eth-ansible-examples/tree/main/playbook-esf-modbus-wires-example
 
 2. Compress the content into a ZIP archive and copy it to the target device(s) (be sure to not include the directory in the zip file. The unzipped files should only contain the `site.yml` and the `roles` directory)
 
@@ -20,13 +20,6 @@ This playbook shows how to perform an ESF bundle upgrade via Everyware Cloud.
 5. On ESF give this new user access to the Rest APIs (see screenshot below)
 
 ![image](https://github.com/user-attachments/assets/7d4c61ba-c56d-4609-8869-154cc88c70d1)
-
-6. On ESF enable Basic Authentication for the Rest APIs (RestService -> Basic Authentication Enabled -> true)
-
-![image](https://github.com/user-attachments/assets/c88c431d-b592-4c02-9fc8-7450ac6dd4d6)
-
-> [!NOTE]
-> For the package installed via this playbook you'll need to ensure ESF is in **development mode**. The Ansible script will install a package which is not signed. In a production environment, you should sign the package before installing it.
 
 ## Instructions
 

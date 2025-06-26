@@ -12,8 +12,8 @@
         method: POST
         body_format: json
         body:
-          username: <username>
-          password: <password>
+          username: maintenance
+          password: maintenance12345
         return_content: true
         status_code: 200
         validate_certs: false
