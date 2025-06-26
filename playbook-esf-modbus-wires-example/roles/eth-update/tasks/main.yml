@@ -1,0 +1,4 @@
+- name: Ensure job_id is defined
+  ansible.builtin.fail:
+    msg: job_id is not defined
+  when: job_id is undefined
