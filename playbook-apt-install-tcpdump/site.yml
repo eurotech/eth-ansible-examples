@@ -1,0 +1,13 @@
+- name: Install or upgrade APT from remote repo
+  hosts: localhost
+  connection: local
+  gather_facts: true
+
+  roles:
+    - eth-update
+
+  tasks:
+    - name: Install via APT
+      ansible.builtin.apt:
+        name: tcpdump
+        state: present
