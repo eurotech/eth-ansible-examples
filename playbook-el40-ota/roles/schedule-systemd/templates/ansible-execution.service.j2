@@ -1,0 +1,13 @@
+[Unit]
+Description=Ansible playbook execution {{ execution_id }}
+{{ extra_unit_items }}
+
+[Service]
+Type=forking
+ExecStart=/bin/sh -c '{{ command }} {{ separator }} (systemctl disable ansible-execution-{{ execution_id }}; rm {{ systemd_services_dir }}/ansible-execution-{{ execution_id }}.service; rm -rf {{ work_dir }})'
+TimeoutSec=infinity
+{{ extra_service_items }}
+
+[Install]
+WantedBy=multi-user.target
+{{ extra_install_items }}
