@@ -1,0 +1,105 @@
+- name: Install Modbus Bundle and configure reading from asset
+  hosts: localhost
+  connection: local
+
+  roles:
+    - eth-update
+
+  tasks:
+    - name: Login to ESF and get session cookie
+      ansible.builtin.uri:
+        url: https://127.0.0.1/services/session/v1/login/password
+        method: POST
+        body_format: json
+        body:
+          username: <username>
+          password: <password>
+        return_content: true
+        status_code: 200
+        validate_certs: false
+        follow_redirects: true
+      register: esf_login
+
+    # - name: Set session cookie fact
+    #   ansible.builtin.set_fact:
+    #     session_cookie: "{{ esf_login.cookies_string }}"
+
+    - name: Get XSRF token
+      ansible.builtin.uri:
+        url: https://127.0.0.1/services/session/v1/xsrfToken
+        method: GET
+        headers:
+          Cookie: "{{ session_cookie }}"
+        return_content: true
+        status_code: 200
+        validate_certs: false
+      register: xsrf_token_response
+
+    # - name: Extract XSRF token
+    #   ansible.builtin.set_fact:
+    #     xsrf_token: "{{ xsrf_token_response.json.xsrfToken }}"
+
+    - name: Get configuration snapshots
+      ansible.builtin.uri:
+        url: https://127.0.0.1/services/configuration/v2/snapshots
+        method: GET
+        headers:
+          Cookie: "{{ session_cookie }}"
+          X-XSRF-TOKEN: "{{ xsrf_token }}"
+        return_content: true
+        status_code: 200
+        validate_certs: false
+      register: snapshots_response
+
+    # - name: Show snapshots
+    #   ansible.builtin.debug:
+    #     var: snapshots_response.json
+
+    - name: Install Modbus DP in ESF
+      ansible.builtin.uri:
+        url: https://127.0.0.1/services/deploy/v2/_install
+        method: POST
+        body_format: json
+        body:
+          url: https://kura-repo.dev.everyware.io/drivers/5.5.0-RELEASE/ESF/com.eurotech.modbus.driver_2.0.4.dp
+        headers:
+          Cookie: "{{ session_cookie }}"
+          X-XSRF-TOKEN: "{{ xsrf_token }}"
+        return_content: true
+        status_code: 200
+        validate_certs: false
+      register: install_response
+
+    - name: Install Modbus components configuration
+      ansible.builtin.uri:
+        url: https://127.0.0.1/services/configuration/v2/configurableComponents/configurations/_update
+        method: PUT
+        body_format: json
+        body: "{{ lookup('file', 'wires_config.json') | from_json }}"
+        headers:
+          Cookie: "{{ session_cookie }}"
+          X-XSRF-TOKEN: "{{ xsrf_token }}"
+        return_content: true
+        status_code: 200
+        validate_certs: false
+      register: config_response
+
+    # - name: Show components configuration
+    #   ansible.builtin.debug:
+    #     var: config_response
+
+    - name: Logout from ESF
+      ansible.builtin.uri:
+        url: https://127.0.0.1/services/session/v1/logout
+        method: POST
+        headers:
+          Cookie: "{{ session_cookie }}"
+          X-XSRF-TOKEN: "{{ xsrf_token }}"
+        return_content: true
+        status_code: 204
+        validate_certs: false
+      register: logout_response
+
+    # - name: Show logout response
+    #   ansible.builtin.debug:
+    #     var: logout_response
