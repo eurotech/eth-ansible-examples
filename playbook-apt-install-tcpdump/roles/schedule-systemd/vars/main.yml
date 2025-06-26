@@ -1,0 +1,4 @@
+execution_id: "{{ ansible_date_time.epoch }}"
+work_dir: "{{ executions_root }}/{{ execution_id }}"
+scheduled_playbook: "{{ work_dir }}/{{ playbook }}"
+systemd_services_dir: /lib/systemd/system
