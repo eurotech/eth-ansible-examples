@@ -20,9 +20,9 @@
         follow_redirects: true
       register: esf_login
 
-    # - name: Set session cookie fact
-    #   ansible.builtin.set_fact:
-    #     session_cookie: "{{ esf_login.cookies_string }}"
+    - name: Set session cookie fact
+      ansible.builtin.set_fact:
+        session_cookie: "{{ esf_login.cookies_string }}"
 
     - name: Get XSRF token
       ansible.builtin.uri:
@@ -35,9 +35,9 @@
         validate_certs: false
       register: xsrf_token_response
 
-    # - name: Extract XSRF token
-    #   ansible.builtin.set_fact:
-    #     xsrf_token: "{{ xsrf_token_response.json.xsrfToken }}"
+    - name: Extract XSRF token
+      ansible.builtin.set_fact:
+        xsrf_token: "{{ xsrf_token_response.json.xsrfToken }}"
 
     - name: Get configuration snapshots
       ansible.builtin.uri:
