@@ -1,0 +1,463 @@
+{
+  "configs": [
+        {
+      "pid": "modbusDriver",
+      "properties": {
+        "access.type": {
+          "value": "TCP",
+          "type": "STRING"
+        },
+        "modbus.rtu.baudrate": {
+          "value": 9600,
+          "type": "INTEGER"
+        },
+        "modbus.rtu.flowcontrolout": {
+          "value": "FLOW_CONTROL_DISABLED",
+          "type": "STRING"
+        },
+        "modbus.holding.register.write.mode": {
+          "value": "WRITE_MULTIPLE_REGISTERS",
+          "type": "STRING"
+        },
+        "modbus.register.max.transfer.size": {
+          "value": 123,
+          "type": "INTEGER"
+        },
+        "modbus.transaction.retry": {
+          "value": 5,
+          "type": "INTEGER"
+        },
+        "service.factoryPid": {
+          "value": "org.eclipse.kura.driver.modbus",
+          "type": "STRING"
+        },
+        "modbus.rtu.databits": {
+          "value": 8,
+          "type": "INTEGER"
+        },
+        "kura.service.pid": {
+          "value": "modbusDriver",
+          "type": "STRING"
+        },
+        "service.pid": {
+          "value": "org.eclipse.kura.driver.modbus-1750931928442-23",
+          "type": "STRING"
+        },
+        "modbus.coil.write.mode": {
+          "value": "WRITE_MULTIPLE_COILS",
+          "type": "STRING"
+        },
+        "modbus.timeout": {
+          "value": 3,
+          "type": "INTEGER"
+        },
+        "modbus.register.minimum.gap.size": {
+          "value": 0,
+          "type": "INTEGER"
+        },
+        "modbus.rtu.encoding": {
+          "value": "SERIAL_ENCODING_RTU",
+          "type": "STRING"
+        },
+        "modbus.rtu.port.name": {
+          "value": "/dev/tty",
+          "type": "STRING"
+        },
+        "modbus.tcp-udp.port": {
+          "value": 5020,
+          "type": "INTEGER"
+        },
+        "modbus.rtu.parity": {
+          "value": "NO_PARITY",
+          "type": "STRING"
+        },
+        "modbus.rtu.flowcontrolin": {
+          "value": "FLOW_CONTROL_DISABLED",
+          "type": "STRING"
+        },
+        "modbus.rtu.stopbits": {
+          "value": "ONE_STOP_BIT",
+          "type": "STRING"
+        },
+        "modbus.tcp-udp.ip": {
+          "value": "172.16.0.5",
+          "type": "STRING"
+        },
+        "modbus.bit.minimum.gap.size": {
+          "value": 0,
+          "type": "INTEGER"
+        },
+        "modbus.bit.max.transfer.size": {
+          "value": 1968,
+          "type": "INTEGER"
+        }
+      }
+    },
+    {
+      "pid": "cPub",
+      "properties": {
+        "app.topic": {
+          "value": "A1/$assetName",
+          "type": "STRING"
+        },
+        "message.type": {
+          "value": "data",
+          "type": "STRING"
+        },
+        "qos": {
+          "value": 0,
+          "type": "INTEGER"
+        },
+        "appId": {
+          "value": "W1",
+          "type": "STRING"
+        },
+        "retain": {
+          "value": false,
+          "type": "BOOLEAN"
+        },
+        "priority": {
+          "value": 7,
+          "type": "INTEGER"
+        },
+        "service.factoryPid": {
+          "value": "org.eclipse.kura.cloud.publisher.CloudPublisher",
+          "type": "STRING"
+        },
+        "cloud.endpoint.service.pid": {
+          "value": "org.eclipse.kura.cloud.CloudService",
+          "type": "STRING"
+        },
+        "kura.service.pid": {
+          "value": "cPub",
+          "type": "STRING"
+        },
+        "service.pid": {
+          "value": "org.eclipse.kura.cloud.publisher.CloudPublisher-1750932171395-31",
+          "type": "STRING"
+        }
+      }
+    },
+    {
+      "pid": "modbusAsset",
+      "properties": {
+        "Channel-2#memory.address": {
+          "value": 2,
+          "type": "INTEGER"
+        },
+        "emit.empty.envelopes": {
+          "value": true,
+          "type": "BOOLEAN"
+        },
+        "Channel-2#primary.table": {
+          "value": "HOLDING_REGISTERS",
+          "type": "STRING"
+        },
+        "Channel-2#+value.type": {
+          "value": "INTEGER",
+          "type": "STRING"
+        },
+        "Channel-2#data.type": {
+          "value": "UINT16",
+          "type": "STRING"
+        },
+        "Channel-2#unit.id": {
+          "value": 1,
+          "type": "INTEGER"
+        },
+        "Channel-2#+name": {
+          "value": "Channel-2",
+          "type": "STRING"
+        },
+        "Channel-2#+unit": {
+          "value": "",
+          "type": "STRING"
+        },
+        "service.factoryPid": {
+          "value": "org.eclipse.kura.wire.WireAsset",
+          "type": "STRING"
+        },
+        "Channel-2#array.data.length": {
+          "value": 1,
+          "type": "INTEGER"
+        },
+        "Channel-2#+type": {
+          "value": "READ_WRITE",
+          "type": "STRING"
+        },
+        "component.id": {
+          "value": 140,
+          "type": "LONG"
+        },
+        "Channel-1#memory.address": {
+          "value": 1,
+          "type": "INTEGER"
+        },
+        "receiver.port.count": {
+          "value": 1,
+          "type": "INTEGER"
+        },
+        "emit.all.channels": {
+          "value": false,
+          "type": "BOOLEAN"
+        },
+        "Channel-1#+scaleoffset.type": {
+          "value": "DEFINED_BY_VALUE_TYPE",
+          "type": "STRING"
+        },
+        "emit.connection.errors": {
+          "value": false,
+          "type": "BOOLEAN"
+        },
+        "emit.on.change": {
+          "value": false,
+          "type": "BOOLEAN"
+        },
+        "Channel-1#+enabled": {
+          "value": true,
+          "type": "BOOLEAN"
+        },
+        "driver.pid": {
+          "value": "modbusDriver",
+          "type": "STRING"
+        },
+        "Channel-1#data.order": {
+          "value": "MSW",
+          "type": "STRING"
+        },
+        "Channel-1#+unit": {
+          "value": "",
+          "type": "STRING"
+        },
+        "component.name": {
+          "value": "org.eclipse.kura.wire.WireAsset",
+          "type": "STRING"
+        },
+        "Channel-2#+enabled": {
+          "value": true,
+          "type": "BOOLEAN"
+        },
+        "Channel-1#data.type": {
+          "value": "UINT16",
+          "type": "STRING"
+        },
+        "emit.errors": {
+          "value": false,
+          "type": "BOOLEAN"
+        },
+        "Channel-1#primary.table": {
+          "value": "HOLDING_REGISTERS",
+          "type": "STRING"
+        },
+        "service.pid": {
+          "value": "org.eclipse.kura.wire.WireAsset-1750932200896-32",
+          "type": "STRING"
+        },
+        "kura.service.pid": {
+          "value": "modbusAsset",
+          "type": "STRING"
+        },
+        "emitter.port.count": {
+          "value": 1,
+          "type": "INTEGER"
+        },
+        "Channel-1#array.data.length": {
+          "value": 1,
+          "type": "INTEGER"
+        },
+        "Channel-1#+listen": {
+          "value": false,
+          "type": "BOOLEAN"
+        },
+        "timestamp.mode": {
+          "value": "PER_CHANNEL",
+          "type": "STRING"
+        },
+        "Channel-1#unit.id": {
+          "value": 1,
+          "type": "INTEGER"
+        },
+        "Channel-1#+name": {
+          "value": "Channel-1",
+          "type": "STRING"
+        },
+        "kura.ui.service.hide": {
+          "value": true,
+          "type": "BOOLEAN"
+        },
+        "Channel-2#+scaleoffset.type": {
+          "value": "DEFINED_BY_VALUE_TYPE",
+          "type": "STRING"
+        },
+        "asset.desc": {
+          "value": "",
+          "type": "STRING"
+        },
+        "Channel-1#+type": {
+          "value": "READ",
+          "type": "STRING"
+        },
+        "Channel-1#+value.type": {
+          "value": "INTEGER",
+          "type": "STRING"
+        },
+        "Channel-2#+listen": {
+          "value": false,
+          "type": "BOOLEAN"
+        },
+        "Channel-2#data.order": {
+          "value": "MSW",
+          "type": "STRING"
+        }
+      }
+    },
+    {
+      "pid": "timer",
+      "properties": {
+        "factoryPid": {
+          "value": "org.eclipse.kura.wire.Timer",
+          "type": "STRING"
+        },
+        "componentId": {
+          "value": "timer",
+          "type": "STRING"
+        },
+        "factoryComponent": {
+          "value": false,
+          "type": "BOOLEAN"
+        },
+        "simple.first.tick.policy": {
+          "value": "DEFAULT",
+          "type": "STRING"
+        },
+        "componentDescription": {
+          "value": "A wire component that fires a ticking event on every configured interval",
+          "type": "STRING"
+        },
+        "simple.interval": {
+          "value": 10,
+          "type": "INTEGER"
+        },
+        "simple.time.unit": {
+          "value": "SECONDS",
+          "type": "STRING"
+        },
+        "type": {
+          "value": "SIMPLE",
+          "type": "STRING"
+        },
+        "service.factoryPid": {
+          "value": "org.eclipse.kura.wire.Timer",
+          "type": "STRING"
+        },
+        "cron.interval": {
+          "value": "0/10 * * * * ?",
+          "type": "STRING"
+        },
+        "kura.service.pid": {
+          "value": "timer",
+          "type": "STRING"
+        },
+        "service.pid": {
+          "value": "org.eclipse.kura.wire.Timer-1750932045301-26",
+          "type": "STRING"
+        },
+        "emitter.port.count": {
+          "value": 1,
+          "type": "INTEGER"
+        },
+        "receiver.port.count": {
+          "value": 0,
+          "type": "INTEGER"
+        },
+        "componentName": {
+          "value": "Timer",
+          "type": "STRING"
+        },
+        "simple.custom.first.tick.interval": {
+          "value": 0,
+          "type": "INTEGER"
+        }
+      }
+    },
+    {
+      "pid": "org.eclipse.kura.wire.graph.WireGraphService",
+      "properties": {
+        "WireGraph": {
+          "value": "{\"components\":[{\"pid\":\"timer\",\"inputPortCount\":0,\"outputPortCount\":1,\"renderingProperties\":{\"position\":{\"x\":-340,\"y\":-60},\"inputPortNames\":{},\"outputPortNames\":{}}},{\"pid\":\"modbusAsset\",\"inputPortCount\":1,\"outputPortCount\":1,\"renderingProperties\":{\"position\":{\"x\":-80,\"y\":-60},\"inputPortNames\":{},\"outputPortNames\":{}}},{\"pid\":\"modbusPublisher\",\"inputPortCount\":1,\"outputPortCount\":0,\"renderingProperties\":{\"position\":{\"x\":200,\"y\":-60},\"inputPortNames\":{},\"outputPortNames\":{}}}],\"wires\":[{\"emitter\":\"timer\",\"emitterPort\":0,\"receiver\":\"modbusAsset\",\"receiverPort\":0},{\"emitter\":\"modbusAsset\",\"emitterPort\":0,\"receiver\":\"modbusPublisher\",\"receiverPort\":0}]}",
+          "type": "STRING"
+        },
+        "kura.service.pid": {
+          "value": "org.eclipse.kura.wire.graph.WireGraphService",
+          "type": "STRING"
+        },
+        "service.pid": {
+          "value": "org.eclipse.kura.wire.graph.WireGraphService",
+          "type": "STRING"
+        }
+      }
+    },
+    {
+      "pid": "modbusPublisher",
+      "properties": {
+        "factoryPid": {
+          "value": "org.eclipse.kura.wire.CloudPublisher",
+          "type": "STRING"
+        },
+        "componentId": {
+          "value": "modbusPublisher",
+          "type": "STRING"
+        },
+        "factoryComponent": {
+          "value": false,
+          "type": "BOOLEAN"
+        },
+        "componentDescription": {
+          "value": "A wire component which publishes data to the cloud platform",
+          "type": "STRING"
+        },
+        "CloudPublisher.target": {
+          "value": "(kura.service.pid\u003dcPub)",
+          "type": "STRING"
+        },
+        "service.factoryPid": {
+          "value": "org.eclipse.kura.wire.CloudPublisher",
+          "type": "STRING"
+        },
+        "kura.service.pid": {
+          "value": "modbusPublisher",
+          "type": "STRING"
+        },
+        "service.pid": {
+          "value": "org.eclipse.kura.wire.CloudPublisher-1750932045391-28",
+          "type": "STRING"
+        },
+        "emitter.port.count": {
+          "value": 0,
+          "type": "INTEGER"
+        },
+        "remove.body.from.metrics": {
+          "value": false,
+          "type": "BOOLEAN"
+        },
+        "receiver.port.count": {
+          "value": 1,
+          "type": "INTEGER"
+        },
+        "set.body.from.property": {
+          "value": "",
+          "type": "STRING"
+        },
+        "componentName": {
+          "value": "Publisher",
+          "type": "STRING"
+        },
+        "publish.position": {
+          "value": "none",
+          "type": "STRING"
+        }
+      }
+    }
+  ],
+  "takeSnapshot": true
+}

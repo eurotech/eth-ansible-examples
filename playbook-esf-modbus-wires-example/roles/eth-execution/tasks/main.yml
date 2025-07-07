@@ -1,0 +1,51 @@
+- name: ensure execution_id is set
+  fail:
+    msg: "required variable execution_id is not set"
+  when: execution_id is not defined
+
+- name: create execution
+  block:
+    - name: ensure playbook file is present
+      file:
+        path: "{{ playbook_dir }}/{{ playbook }}"
+
+    - name: create execution and job directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ work_dir }}"
+        - "{{ job_dir }}"
+
+    - name: copy playbook resources
+      shell: cp -r {{ playbook_dir }}/* {{ work_dir }}
+
+    - name: register execution
+      lineinfile:
+        path: "{{ required_executions_file }}"
+        line: "{{ execution_id }}"
+        create: yes
+
+    - name: set ansible commandline
+      set_fact:
+        scheduled_execution:
+          id: "{{ execution_id }}"
+          commandline: "ETH_JOB_ID=\"{{ job_id }}\" ETH_EXECUTION_ID=\"{{ execution_id }}\" ansible-playbook \"{{ work_dir }}/{{ playbook }}\" {% if start_task | trim | length %} --start-at-task=\"{{ start_task }}\"{% endif %} {{ extra_playbook_args }}"
+
+  when: state == "present"
+
+- name: delete execution
+  block:
+
+    - name: delete scheduled playbook dir
+      file:
+        path: "{{ work_dir }}"
+        state: absent
+
+    - name: unregister execution
+      lineinfile:
+        path: "{{ required_executions_file }}"
+        line: "{{ execution_id }}"
+        state: absent
+
+  when: state == "absent"

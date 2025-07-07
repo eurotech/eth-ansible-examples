@@ -1,0 +1,47 @@
+- name: load timestamp
+  setup:
+    filter: ansible_date_time
+
+- name: schedule execution
+  block:
+    - name: prepare execution
+      include_role:
+        name: eth-execution
+      vars:
+        state: present
+
+    - name: install playbook unit
+      template:
+        src: "{{ role_path }}/templates/ansible-execution.service.j2"
+        dest: "{{ systemd_services_dir }}/ansible-execution-{{ execution_id }}.service"
+      vars:
+        command: "{{ scheduled_execution.commandline }}"
+        separator: "{% if retry_on_failure == true %}&&{% else %};{% endif %}"
+
+    - name: enable playbook unit
+      systemd:
+        name: "ansible-execution-{{ execution_id }}"
+        daemon_reload: yes
+        enabled: yes
+
+  rescue:
+    - name: remove execution
+      include_role:
+        name: eth-execution
+      vars:
+        state: absent
+
+    - name: disable playbook unit
+      systemd:
+        name: "ansible-execution-{{ execution_id }}"
+        daemon_reload: yes
+        enabled: no
+      ignore_errors: yes
+
+    - name: delete playbook unit
+      file:
+        path: "{{ systemd_services_dir }}/ansible-execution-{{ execution_id }}.service"
+        state: absent
+
+    - fail:
+        msg: "failed to schedule playbook unit"
